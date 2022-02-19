@@ -17,7 +17,6 @@ tasks:
       - cp ./.modules/devcontainers/script-library/sshd-debian.sh ./scripts/sshd.sh
       - mkdir -p ./local
       - cp ./.config/Brewfile ./local/Brewfile
-      - cp ./.config/package-global.json ./local/package-global.json
       - task: download
 
   download:
