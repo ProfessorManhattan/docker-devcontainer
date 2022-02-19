@@ -1,0 +1,31 @@
+---
+version: '3'
+
+tasks:
+  copy:
+    log:
+      error: 'Encountered error while copying files'
+      start: 'Copying scripts from `vscode-dev-containers`` submodule and other places'
+      success: 'Synchronized scripts from `vscode-dev-containers` submodule and other places'
+    cmds:
+      - task: :common:update:modules
+      - mkdir -p ./scripts
+      - cp ./.modules/devcontainers/script-library/common-debian.sh ./scripts/common.sh
+      - cp ./.modules/devcontainers/script-library/desktop-lite-debian.sh ./scripts/desktop.sh
+      - cp ./.modules/devcontainers/script-library/docker-in-docker-debian.sh ./scripts/dind.sh
+      - cp ./.modules/devcontainers/script-library/homebrew-debian.sh ./scripts/homebrew.sh
+      - cp ./.modules/devcontainers/script-library/sshd-debian.sh ./scripts/sshd.sh
+      - mkdir -p ./local
+      - cp ./.config/Brewfile ./local/Brewfile
+      - cp ./.config/package-global.json ./local/package-global.json
+      - task: download
+
+  download:
+    log:
+      error: Error downloading files
+      start: Downloading files to populate project with certain upstream files
+      success: Finished downloading files / populating project with upstream files
+    cmds:
+      - mkdir -p ./local
+      - curl -sSL https://gitlab.com/megabyte-labs/common/shared/-/raw/master/pyproject.toml > ./local/pyproject.toml
+      - curl -sSL https://gitlab.com/megabyte-labs/common/shared/-/raw/master/package.json > ./local/package.json

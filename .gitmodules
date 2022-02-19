@@ -1,0 +1,4 @@
+[submodule ".modules/devcontainers"]
+	branch = master
+	path = .modules/devcontainers
+	url = https://github.com/microsoft/vscode-dev-containers.git

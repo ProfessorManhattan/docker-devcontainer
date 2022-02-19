@@ -1,0 +1,228 @@
+{
+  "private": false,
+  "name": "@megabytelabs/codeclimate-eslint",
+  "version": "0.0.3",
+  "description": "An ESLint 8 slim container and a CodeClimate engine container for GitLab CI",
+  "license": "MIT",
+  "author": "Brian Zalewski <brian@megabyte.space> (https://megabyte.space)",
+  "homepage": "https://megabyte.space",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProfessorManhattan/codeclimate-eslint.git"
+  },
+  "bugs": {
+    "email": "help@megabyte.space",
+    "url": "https://gitlab.com/megabyte-labs/docker/codeclimate/eslint/-/issues"
+  },
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "files": [
+    "bin/",
+    "dist/"
+  ],
+  "scripts": {
+    "build": "task project:copy && task docker:build",
+    "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
+    "help": "task --menu",
+    "prepare": "npm run start && (test -f Taskfile.yml && task common:husky) || true",
+    "repair": "bash <(curl -sS https://install.doctor/repair)",
+    "start": "bash start.sh",
+    "test": "task docker:test"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/git-cz-emoji"
+    }
+  },
+  "typings": "dist/main.d.ts",
+  "dependencies": {},
+  "optionalDependencies": {},
+  "devDependencies": {
+    "@commitlint/config-conventional": "^16.0.0",
+    "@washingtondc/development": "latest",
+    "eslint-config-strict-mode": "latest",
+    "git-cz-emoji": "latest",
+    "glob": "^7.2.0",
+    "handlebars-helpers": "^0.10.0",
+    "prettier-config-sexy-mode": "latest",
+    "semantic-release-config": "latest",
+    "typescript": "^4.5.5"
+  },
+  "keywords": [
+    "codespaces",
+    "container",
+    "docker",
+    "dockerfile",
+    "github",
+    "mblabs",
+    "megabytelabs",
+    "professormanhattan",
+    "virtualization"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "publishConfig": {
+    "@megabyte:registry": "https://gitlab.com/api/v4/projects/32219047/packages/npm/",
+    "access": "public"
+  },
+  "blueprint": {
+    "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+    "group": "docker",
+    "name": "Megabyte Labs DevContainer",
+    "overview": "This project is home of the base Docker image used for provisioning [DevContainer environments](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/configuring-codespaces-for-your-project). A DevContainer environment is a Docker image that bundles common dependencies and build tools so that development environments can be easily spun up and transferred remotely. Both GitHub and VSCode have native support for DevContainers. This project borrows most of its' code from the [Microsoft vscode-dev-containers repository](https://github.com/microsoft/vscode-dev-containers/). After applying their base system changes:\n\n* A [Brewfile](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/Brewfile) is used to install software\n* A [global-package.json](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/global-package.json) is used to install global NPM dependencies\n* The rest is handled somewhat dynamically by **[Bodega](https://github.com/ProfessorManhattan/Bodega)** and the `Taskfile.yml` that is present in all of our repositories",
+    "repository": {
+      "github": "https://github.com/ProfessorManhattan/docker-devcontainer",
+      "gitlab": "https://gitlab.com/megabyte-labs/docker/software/devcontainer"
+    },
+    "slug": "devcontainer",
+    "subgroup": "software",
+    "title": "An All-in-One DevContainer Environment for Rapid Development"
+  },
+  "changelog": {
+    "displayTypes": [
+      "feat",
+      "fix",
+      "perf",
+      "refactor",
+      "revert"
+    ],
+    "showAuthor": true
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
+    "helpUrl": "https://megabyte.space/docs/contributing/commits"
+  },
+  "engine": "node >= 0.12.4",
+  "eslintConfig": {
+    "extends": "eslint-config-strict-mode",
+    "ignorePatterns": [
+      "bin/eslint.js",
+      "test/",
+      "test-output/"
+    ],
+    "rules": {}
+  },
+  "funding": [
+    {
+      "type": "opencollective",
+      "url": "https://opencollective.com/megabytelabs"
+    },
+    {
+      "type": "patreon",
+      "url": "https://www.patreon.com/ProfessorManhattan"
+    }
+  ],
+  "lint-staged": {
+    "(Brewfile|composer.lock|Gemfile|Gopkg.lock|Pipfile.lock)": [
+      "task fix:prettier --"
+    ],
+    "**/!(logo).(jpg|png)": [
+      "task image:compress --"
+    ],
+    "**/*": [
+      "task lint:any --"
+    ],
+    "**/*.(bash|cfg|cgi|command|css|env|env.*|handlebars|hbs|html|less|fcgi|java|md|mdx|mjml|php|phtml|properties|reg|scss|tmpl|tmux|tool|tpl|zsh)": [
+      "task fix:prettier --"
+    ],
+    "**/*.(cjs|js|jsx|mjs|ts|tsx)": [
+      "task fix:js --",
+      "task lint:js --"
+    ],
+    "**/*.(json|webapp|webmanifest)": [
+      "task fix:json --"
+    ],
+    "**/*.(yml|yaml)": [
+      "task fix:yaml --",
+      "task lint:yaml --"
+    ],
+    "**/*.go": [
+      "task fix:go --",
+      "task lint:go --"
+    ],
+    "**/*.php": [
+      "task fix:php --",
+      "task lint:php --"
+    ],
+    "**/*.py": [
+      "task fix:python --",
+      "task lint:python --"
+    ],
+    "**/*.sh": [
+      "task fix:prettier --",
+      "task fix:shell --",
+      "task lint:shell --"
+    ],
+    "**/*.toml": [
+      "task fix:prettier --",
+      "task lint:toml --"
+    ],
+    "**/*.xml": [
+      "task fix:xml --",
+      "task lint:xml --"
+    ],
+    "Dockerfile": [
+      "task fix:prettier --",
+      "task lint:docker --"
+    ],
+    "Vagrantfile": [
+      "task fix:prettier --",
+      "task lint:vagrant"
+    ],
+    "logo.png": [
+      "task image:resize -- 200 200",
+      "task image:compress --"
+    ]
+  },
+  "ntl": {
+    "descriptions": {
+      "build": "Builds the project using the build command specified under scripts in package.json",
+      "bump": "Used to quickly build, increase the package.json version, and publish the package",
+      "help": "Display the Bodega Taskfile.yml interactive help menu",
+      "prepare": "A hook triggered by running npm install that runs logic such as installing pre-commit hooks",
+      "repair": "Fixes basic issues in projects that are having trouble running basic commands like 'task start'",
+      "start": "Entrypoint for new developers that installs requirements and then runs 'task start'",
+      "test": "Runs the appropriate test logic by running the test command defined under scripts in package.json"
+    }
+  },
+  "pnpm": {
+    "allowedVersions": {
+      "@typescript-eslint/eslint-plugin": "5",
+      "eslint": "8",
+      "typescript": "4"
+    },
+    "neverBuiltDependencies": [
+      "core-js",
+      "core-js-pure",
+      "highlight.js"
+    ],
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@typescript-eslint/eslint-plugin",
+        "eslint",
+        "prettier",
+        "typescript"
+      ]
+    }
+  },
+  "prettier": "prettier-config-sexy-mode",
+  "release": {
+    "branches": [
+      "main",
+      "master",
+      "next",
+      {
+        "name": "beta",
+        "prerelease": true
+      },
+      {
+        "name": "alpha",
+        "prerelease": true
+      }
+    ],
+    "extends": "semantic-release-config"
+  }
+}
