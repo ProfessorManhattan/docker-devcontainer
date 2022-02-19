@@ -57,3 +57,20 @@ VOLUME ["/var/lib/docker"]
 
 ENTRYPOINT ["/usr/local/share/desktop-init.sh", "/usr/local/share/ssh-init.sh", "/usr/local/share/docker-init.sh"]
 CMD ["sleep", "infinity"]
+ARG BUILD_DATE
+ARG REVISION
+ARG VERSION
+
+LABEL maintainer="Megabyte Labs <help@megabyte.space>"
+LABEL org.opencontainers.image.authors="Brian Zalewski <brian@megabyte.space>"
+LABEL org.opencontainers.image.created=$BUILD_DATE
+LABEL org.opencontainers.image.description="The DevContainer Docker-based development environment for Megabyte Labs projects"
+LABEL org.opencontainers.image.documentation="https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/README.md"
+LABEL org.opencontainers.image.licenses="MIT"
+LABEL org.opencontainers.image.revision=$REVISION
+LABEL org.opencontainers.image.source="[[ Injected by running `task update` ]]"
+LABEL org.opencontainers.image.url="https://megabyte.space"
+LABEL org.opencontainers.image.vendor="Megabyte Labs"
+LABEL org.opencontainers.image.version=$VERSION
+LABEL space.megabyte.type="software"
+
