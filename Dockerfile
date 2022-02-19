@@ -41,8 +41,8 @@ RUN apt-get clean \
 
 USER ${USERNAME}
 
-RUN bash start.sh \
-    && brew bundle install
+RUN bash start.sh
+RUN brew bundle install
 RUN task install:go:bundle \
     && task install:rust:bundle
 RUN task install:github:bundle \
