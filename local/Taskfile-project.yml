@@ -4,9 +4,9 @@ version: '3'
 tasks:
   copy:
     log:
-      error: 'Encountered error while copying files'
-      start: 'Copying scripts from `vscode-dev-containers`` submodule and other places'
-      success: 'Synchronized scripts from `vscode-dev-containers` submodule and other places'
+      error: Encountered error while copying files
+      start: Copying scripts from `vscode-dev-containers`` submodule and other places
+      success: Synchronized scripts from `vscode-dev-containers` submodule and other places
     cmds:
       - task: :common:update:modules
       - mkdir -p ./scripts

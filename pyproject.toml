@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://megabyte.space"
 documentation = "https://megabyte.space/docs/docker/software"
 repository = "https://github.com/ProfessorManhattan/docker-devcontainer"
-keywords = ["codespaces", "container", "docker", "dockerfile", "github", "mblabs", "megabytelabs", "professormanhattan", "virtualization"]
+keywords = ["codespaces", "container", "docker", "dockerfile", "github", "mblabs", "megabytelabs", "professormanhattan", "software", "virtualization", "washingtondc"]
 include = ["docs/CHANGELOG.md", "LICENSE"]
 classifiers = [
   "Development Status :: 4 - Beta",

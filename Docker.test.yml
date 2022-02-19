@@ -18,7 +18,7 @@ commandTests:
   - name: ZSH
     command: which zsh
     exitCode: 0
-  - name:  Go -> goreleaser --version
+  - name: Go -> goreleaser --version
     command: goreleaser --version
     exitCode: 0
   - name: Rust -> catfs --version

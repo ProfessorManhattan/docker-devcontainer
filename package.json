@@ -1,7 +1,79 @@
 {
+  "private": false,
+  "name": "@megabytelabs/devcontainer",
+  "version": "0.0.3",
+  "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+  "license": "MIT",
   "author": "Brian Zalewski <brian@megabyte.space> (https://megabyte.space)",
+  "homepage": "https://megabyte.space",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProfessorManhattan/docker-devcontainer.git"
+  },
+  "bugs": {
+    "email": "help@megabyte.space",
+    "url": "https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/issues"
+  },
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "files": [
+    "bin/",
+    "dist/"
+  ],
+  "scripts": {
+    "build": "task docker:build",
+    "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
+    "help": "task --menu",
+    "prepare": "npm run start && (test -f Taskfile.yml && task common:husky) || true",
+    "repair": "bash <(curl -sS https://install.doctor/repair)",
+    "start": "bash start.sh",
+    "test": "task docker:test"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/git-cz-emoji"
+    }
+  },
+  "typings": "dist/main.d.ts",
+  "dependencies": {},
+  "optionalDependencies": {},
+  "devDependencies": {
+    "@commitlint/config-conventional": "^16.0.0",
+    "@washingtondc/development": "latest",
+    "cz-emoji-conventional": "^1.0.1",
+    "eslint-config-strict-mode": "latest",
+    "git-cz-emoji": "latest",
+    "glob": "^7.2.0",
+    "handlebars-helpers": "^0.10.0",
+    "prettier-config-sexy-mode": "latest",
+    "semantic-release-config": "latest",
+    "typescript": "^4.5.5"
+  },
+  "keywords": [
+    "codespaces",
+    "container",
+    "docker",
+    "dockerfile",
+    "github",
+    "mblabs",
+    "megabytelabs",
+    "professormanhattan",
+    "software",
+    "virtualization",
+    "washingtondc"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "publishConfig": {
+    "@megabyte:registry": "https://gitlab.com/api/v4/projects/33871141/packages/npm/",
+    "access": "public"
+  },
   "blueprint": {
     "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+    "github_id": "R_kgDOG31-vQ",
+    "gitlab_group_id": "11773364",
+    "gitlab_project_id": "33871141",
     "group": "docker",
     "name": "Megabyte Labs DevContainer",
     "overview": "This project is home of the base Docker image used for provisioning [DevContainer environments](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/configuring-codespaces-for-your-project). A DevContainer environment is a Docker image that bundles common dependencies and build tools so that development environments can be easily spun up and transferred remotely. Both GitHub and VSCode have native support for DevContainers. This project borrows most of its' code from the [Microsoft vscode-dev-containers repository](https://github.com/microsoft/vscode-dev-containers/). After applying their base system changes:\n\n* A [Brewfile](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/Brewfile) is used to install software\n* A [global-package.json](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/global-package.json) is used to install global NPM dependencies\n* The rest is handled somewhat dynamically by **[Bodega](https://github.com/ProfessorManhattan/Bodega)** and the `Taskfile.yml` that is present in all of our repositories",
@@ -12,10 +84,6 @@
     "slug": "devcontainer",
     "subgroup": "software",
     "title": "An All-in-One DevContainer Environment for Rapid Development"
-  },
-  "bugs": {
-    "email": "help@megabyte.space",
-    "url": "https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/issues"
   },
   "changelog": {
     "displayTypes": [
@@ -33,29 +101,7 @@
     ],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/git-cz-emoji"
-    }
-  },
-  "dependencies": {},
-  "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
-  "devDependencies": {
-    "@commitlint/config-conventional": "^16.0.0",
-    "@washingtondc/development": "latest",
-    "cz-emoji-conventional": "^1.0.1",
-    "eslint-config-strict-mode": "latest",
-    "git-cz-emoji": "latest",
-    "glob": "^7.2.0",
-    "handlebars-helpers": "^0.10.0",
-    "prettier-config-sexy-mode": "latest",
-    "semantic-release-config": "latest",
-    "typescript": "^4.5.5"
-  },
   "engine": "node >= 0.12.4",
-  "engines": {
-    "node": ">=14.18.0"
-  },
   "eslintConfig": {
     "extends": "eslint-config-strict-mode",
     "ignorePatterns": [
@@ -65,10 +111,6 @@
     ],
     "rules": {}
   },
-  "files": [
-    "bin/",
-    "dist/"
-  ],
   "funding": [
     {
       "type": "opencollective",
@@ -79,21 +121,6 @@
       "url": "https://www.patreon.com/ProfessorManhattan"
     }
   ],
-  "homepage": "https://megabyte.space",
-  "keywords": [
-    "codespaces",
-    "container",
-    "docker",
-    "dockerfile",
-    "github",
-    "mblabs",
-    "megabytelabs",
-    "professormanhattan",
-    "software",
-    "virtualization",
-    "washingtondc"
-  ],
-  "license": "MIT",
   "lint-staged": {
     "(Brewfile|composer.lock|Gemfile|Gopkg.lock|Pipfile.lock)": [
       "task fix:prettier --"
@@ -156,8 +183,6 @@
       "task image:compress --"
     ]
   },
-  "main": "dist/main.js",
-  "name": "@megabytelabs/devcontainer",
   "ntl": {
     "descriptions": {
       "build": "Builds the project using the build command specified under scripts in package.json",
@@ -169,7 +194,6 @@
       "test": "Runs the appropriate test logic by running the test command defined under scripts in package.json"
     }
   },
-  "optionalDependencies": {},
   "pnpm": {
     "allowedVersions": {
       "@typescript-eslint/eslint-plugin": "5",
@@ -191,11 +215,6 @@
     }
   },
   "prettier": "prettier-config-sexy-mode",
-  "private": false,
-  "publishConfig": {
-    "@megabyte:registry": "https://gitlab.com/api/v4/projects//packages/npm/",
-    "access": "public"
-  },
   "release": {
     "branches": [
       "main",
@@ -211,21 +230,5 @@
       }
     ],
     "extends": "semantic-release-config"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ProfessorManhattan/docker-devcontainer.git"
-  },
-  "scripts": {
-    "build": "task docker:build",
-    "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
-    "help": "task --menu",
-    "prepare": "npm run start && (test -f Taskfile.yml && task common:husky) || true",
-    "repair": "bash <(curl -sS https://install.doctor/repair)",
-    "start": "bash start.sh",
-    "test": "task docker:test"
-  },
-  "type": "commonjs",
-  "typings": "dist/main.d.ts",
-  "version": "0.0.3"
+  }
 }
