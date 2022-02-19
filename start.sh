@@ -340,9 +340,7 @@ elif [[ "$OSTYPE" == 'linux-gnu'* ]] || [[ "$OSTYPE" == 'linux-musl'* ]]; then
 fi
 
 # @description Ensures Homebrew, Poetry, jq, and yq are installed
-echo "OSTYPE -> $OSTYPE"
 if [[ "$OSTYPE" == 'darwin'* ]] || [[ "$OSTYPE" == 'linux-gnu'* ]] || [[ "$OSTYPE" == 'linux-musl'* ]]; then
-  echo "INIT_CWD -> $INIT_CWD"
   if [ -z "$INIT_CWD" ]; then
     if ! type brew &> /dev/null; then
       if sudo -n true; then
