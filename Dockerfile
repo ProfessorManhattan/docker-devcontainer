@@ -36,12 +36,12 @@ RUN bash /tmp/scripts/dind.sh "${ENABLE_NONROOT_DOCKER}" "${USERNAME}" "${USE_MO
 RUN bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true"
 RUN apt-get install -y --no-install-recommends sshfs
 RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/* \
-    && chown -R "${USERNAME}:${USERNAME}" ./
+    && rm -rf /var/lib/apt/lists/*
 
 USER megabyte
 
-RUN bash start.sh
+RUN sudo chown -R "${USERNAME}:${USERNAME}" . \
+    && bash start.sh
 RUN brew bundle install
 RUN task install:go:bundle \
     && task install:rust:bundle
