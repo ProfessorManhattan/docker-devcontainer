@@ -39,7 +39,7 @@ RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && chown -R "${USERNAME}:${USERNAME}" ./
 
-USER ${USERNAME}
+USER megabyte
 
 RUN bash start.sh
 RUN brew bundle install
