@@ -258,8 +258,8 @@ function installTask() {
     mkdir -p "$TARGET_BIN_DIR"
   fi
   mv "$TMP_DIR/task/task" "$TARGET_DEST"
-  if sudo -n true; then
-    mv "$TARGET_DEST" /usr/local/bin/task
+  if type sudo &> /dev/null && sudo -n true; then
+    sudo mv "$TARGET_DEST" /usr/local/bin/task
     logger success "Installed Task to /usr/local/bin/task"
   else
     logger success "Installed Task to $TARGET_DEST"
@@ -348,7 +348,7 @@ fi
 if [[ "$OSTYPE" == 'darwin'* ]] || [[ "$OSTYPE" == 'linux-gnu'* ]] || [[ "$OSTYPE" == 'linux-musl'* ]]; then
   if [ -z "$INIT_CWD" ]; then
     if ! type brew &> /dev/null; then
-      if sudo -n true; then
+      if type sudo &> /dev/null && sudo -n true; then
         echo | /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
       else
         logger warn "Homebrew is not installed. The script will attempt to install Homebrew and you might be prompted for your password."
@@ -395,7 +395,7 @@ fi
 ensureTaskInstalled
 
 # @description Run the start logic, if appropriate
-if [ -z "$GITLAB_CI" ] && [ -z "$INIT_CWD" ] && [ -f Taskfile.yml ]; then
+if [ -z "$CI" ] && [ -z "$INIT_CWD" ] && [ -f Taskfile.yml ]; then
   # shellcheck disable=SC1091
   . "$HOME/.profile"
   if task donothing &> /dev/null; then
