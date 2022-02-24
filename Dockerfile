@@ -34,7 +34,7 @@ RUN apt-get update \
 RUN bash /tmp/scripts/desktop.sh "${USERNAME}" "${PASSWORD}" "true" "${VNC_PORT}" "${NOVNC_PORT}"
 RUN bash /tmp/scripts/dind.sh "${ENABLE_NONROOT_DOCKER}" "${USERNAME}" "${USE_MOBY}" "${DOCKER_VERSION}"
 RUN bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true"
-RUN apt-get install -y --no-install-recommends sshfs
+RUN apt-get install -y --no-install-recommends build-essential sshfs
 RUN apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -42,6 +42,7 @@ USER megabyte
 
 RUN sudo chown -R "${USERNAME}:${USERNAME}" . \
     && bash start.sh
+RUN brew install gcc
 RUN brew bundle install
 RUN task install:go:bundle \
     && task install:rust:bundle
@@ -49,6 +50,7 @@ RUN task install:github:bundle \
     && task install:npm:bundle
 RUN task install:pipx:bundle \
     && task install:apt:clean
+RUN curl -sSL https://sdk.cloud.google.com | bash
 
 COPY local/package.json local/pyproject.toml ./
 
