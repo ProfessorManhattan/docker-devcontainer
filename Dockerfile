@@ -27,16 +27,38 @@ VOLUME ["/work"]
 WORKDIR /work
 
 COPY scripts/*.sh /tmp/scripts/
-COPY start.sh local/Brewfile .config Taskfile.yml ./
+COPY local/initctl start.sh local/Brewfile .config Taskfile.yml ./
 
-RUN apt-get update \
+SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
+RUN set -ex \
+  && apt-get update \
+    && apt-get upgrade -y \
     && bash /tmp/scripts/common.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true"
 RUN bash /tmp/scripts/desktop.sh "${USERNAME}" "${PASSWORD}" "true" "${VNC_PORT}" "${NOVNC_PORT}"
 RUN bash /tmp/scripts/dind.sh "${ENABLE_NONROOT_DOCKER}" "${USERNAME}" "${USE_MOBY}" "${DOCKER_VERSION}"
 RUN bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true"
-RUN apt-get install -y --no-install-recommends build-essential sshfs
+RUN apt-get install -y --no-install-recommends build-essential sshfs systemd systemd-cron systemd-sysv
 RUN apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    && rm -Rf /usr/share/doc \
+      /usr/share/man \
+      /tmp/* \
+      /var/tmp/* \
+    && rm -rf /sbin/initctl \
+    && mv initctl /sbin/initctl \
+    && rm -rf /var/lib/apt/lists/* \
+    && cd /lib/systemd/system/sysinit.target.wants/ \
+    && ls | grep -v systemd-tmpfiles-setup | xargs rm -f "$1" \
+    && rm -f /lib/systemd/system/multi-user.target.wants/* \
+      /etc/systemd/system/*.wants/* \
+      /lib/systemd/system/local-fs.target.wants/* \
+      /lib/systemd/system/sockets.target.wants/*udev* \
+      /lib/systemd/system/sockets.target.wants/*initctl* \
+      /lib/systemd/system/basic.target.wants/* \
+      /lib/systemd/system/anaconda.target.wants/* \
+      /lib/systemd/system/plymouth* \
+      /lib/systemd/system/systemd-update-utmp* \
+      /lib/systemd/system/systemd*udev* \
+      /lib/systemd/system/getty.target
 
 USER megabyte
 
@@ -58,9 +80,10 @@ RUN task install:python:requirements \
     && task install:modules:local
 
 VOLUME ["/var/lib/docker"]
+VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
 
 ENTRYPOINT ["/usr/local/share/desktop-init.sh", "/usr/local/share/ssh-init.sh", "/usr/local/share/docker-init.sh"]
-CMD ["sleep", "infinity"]
+CMD ["/lib/systemd/systemd"]
 
 ARG BUILD_DATE
 ARG REVISION
