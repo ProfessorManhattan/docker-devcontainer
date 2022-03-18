@@ -9,17 +9,16 @@ tasks:
   catfs:
     run: once
     cmds:
-      - task: install
+      - task: install:rust
         vars:
+          BIN_NAME: catfs
           PACKAGE: catfs
-    status:
-      - type catfs > /dev/null
 
-  install:
+  install:rust:
     deps:
       - :install:software:rust
     vars:
-      BIN: '{{if index . "BIN"}}{{.BIN}}{{else}}{{.PACKAGE}}{{end}}'
+      BIN: '{{if .BIN_NAME}}{{.BIN_NAME}}{{else}}{{.PACKAGE}}{{end}}'
     run: when_changed
     log:
       error: Failed to install Cargo crate `{{.PACKAGE}}`

@@ -5,12 +5,10 @@ tasks:
   bin:
     run: once
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: bin
+          BIN_NAME: bin
           PACKAGE: github.com/marcosnils/bin@latest
-    status:
-      - type bin &> /dev/null
 
   bundle:
     deps:
@@ -19,49 +17,51 @@ tasks:
       - goreleaser
       - nfpm
 
-  get:
-    run: when_changed
-    log:
-      error: Failed to acquire Go package named `{{.PACKAGE}}`
-      start: Getting Go package named `{{.PACKAGE}}`
-      success: Retrieved Go packaged named `{{.PACKAGE}}`
+  gitomatic:
+    run: once
     cmds:
-      - task: :install:software:go
-      - go get {{.PACKAGE}}
-    status:
-      - type {{.BIN}} > /dev/null
+      - task: install:go
+        vars:
+          BIN_NAME: gitomatic
+          PACKAGE: github.com/muesli/gitomatic@latest
+
+  goconvey:
+    run: once
+    cmds:
+      - task: install:go
+        vars:
+          BIN_NAME: goconvey
+          PACKAGE: github.com/smartystreets/goconvey@latest
 
   goofys:
     run: once
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: goofys
+          BIN_NAME: goofys
           PACKAGE: github.com/kahing/goofys@latest
-    status:
-      - type goofys > /dev/null
 
   goreleaser:
     run: once
+    tags:
+      - semantic
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: goreleaser
+          BIN_NAME: goreleaser
           PACKAGE: github.com/goreleaser/goreleaser@latest
-    status:
-      - type goreleaser > /dev/null
 
   gotestsum:
     run: once
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: gotestsum
+          BIN_NAME: gotestsum
           PACKAGE: gotest.tools/gotestsum@latest
-    status:
-      - type gotestsum > /dev/null
 
-  install:
+  install:go:
+    vars:
+      BIN: '{{.BIN_NAME}}'
     run: when_changed
     log:
       error: Failed to install `{{.PACKAGE}}` with Go
@@ -76,17 +76,27 @@ tasks:
   misspell:
     run: once
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: misspell
+          BIN_NAME: misspell
           PACKAGE: github.com/client9/misspell/cmd/misspell@latest
 
   nfpm:
     run: once
+    tags:
+      - semantic
     cmds:
-      - task: install
+      - task: install:go
         vars:
-          BIN: nfpm
+          BIN_NAME: nfpm
           PACKAGE: github.com/goreleaser/nfpm/v2/cmd/nfpm@latest
-    status:
-      - type nfpm > /dev/null
+
+  node-prune:
+    run: once
+    tags:
+      - semantic
+    cmds:
+      - task: install:go
+        vars:
+          BIN_NAME: node-prune
+          PACKAGE: go install github.com/tj/node-prune@latest

@@ -7,8 +7,6 @@ tasks:
       - :install:software:docker
       - :install:software:jq
     desc: Build a normal Docker container from the Dockerfile
-    hide:
-      sh: '[ ! -f Dockerfile ]'
     summary: |
       # Build Docker Container from Dockerfile
 
@@ -21,33 +19,33 @@ tasks:
       BUILD_DATE:
         sh: git show -s --format=%cI
       DOCKER_IMAGE:
-        sh: echo "{{.DOCKERHUB_PROFILE}}/{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
+        sh: echo "{{.DOCKERHUB_PROFILE}}/$(jq -r '.blueprint.slug' package.json)"
+      MAJOR_VERSION:
+        sh: jq -r '.version' package.json | sed 's/\..*\..*$//'
       REVISION:
         sh: git rev-parse HEAD
       SLUG:
-        sh: |
-          {{if .CLI_ARGS}}
-          if echo '{{.CLI_ARGS}}' | grep 'codeclimate-' > /dev/null; then
-            echo '{{.CLI_ARGS}}'
-          else
-            echo 'false'
-          fi
-          {{else}}
-          echo "codeclimate-$(jq -r '.blueprint.slug' package.json)"
-          {{end}}
+        sh: jq -r '.blueprint.slug' package.json
+      TAG_POST: '{{if (contains "codeclimate" .CLI_ARGS)}}-codeclimate{{end}}'
       VERSION:
         sh: jq -r '.version' package.json
+    run: when_changed
+    hide:
+      sh: '[ ! -f Dockerfile ]'
     log:
       error: Error building `{{.DOCKER_IMAGE}}:{{.VERSION}}`
       start: Building Docker container `{{.DOCKER_IMAGE}}:{{.VERSION}}` (also tagged as latest)
       success: Successfully built Docker container named `{{.DOCKER_IMAGE}}:{{.VERSION}}`
     cmds:
       - .config/log info 'Running `docker build --build-arg BUILD_DATE={{.BUILD_DATE}} --build-arg REVISION={{.REVISION}} --build-arg VERSION={{.VERSION}}
-        --tag {{.DOCKER_IMAGE}}:latest --tag {{.DOCKER_IMAGE}}:{{.VERSION}} {{if eq .REPOSITORY_SUBTYPE "codeclimate"}}{{if ne .SLUG "false"}}
-        --tag codeclimate/{{.SLUG}}:latest{{end}}{{end}}{{if .CLI_ARGS}} --target {{.CLI_ARGS}}{{end}} .`'
+        --tag {{.DOCKER_IMAGE}}:latest{{.TAG_POST}}
+        {{if (contains "codeclimate" .CLI_ARGS)}} --tag codeclimate/codeclimate-{{.SLUG}}{{end}}{{if .CLI_ARGS}}
+        --target {{.CLI_ARGS}}{{end}} .`'
       - docker build --build-arg BUILD_DATE={{.BUILD_DATE}} --build-arg REVISION={{.REVISION}} --build-arg VERSION={{.VERSION}}
-        --tag {{.DOCKER_IMAGE}}:latest --tag {{.DOCKER_IMAGE}}:{{.VERSION}}{{if eq .REPOSITORY_SUBTYPE "codeclimate"}}{{if ne .SLUG "false"}}
-        --tag codeclimate/{{.SLUG}}:latest{{end}}{{end}}{{if .CLI_ARGS}} --target {{.CLI_ARGS}}{{end}} .
+        --tag {{.DOCKER_IMAGE}}:latest{{.TAG_POST}}
+        {{if (contains "codeclimate" .CLI_ARGS)}} --tag codeclimate/codeclimate-{{.SLUG}}{{end}}
+        {{if .CLI_ARGS}} --target {{.CLI_ARGS}}{{end}} .
+      - task: :docker:update:version
 
   slim:
     deps:
@@ -73,9 +71,11 @@ tasks:
   slim:command:
     vars:
       DOCKER_IMAGE:
-        sh: echo "{{.DOCKERHUB_PROFILE}}/{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
+        sh: echo "{{.DOCKERHUB_PROFILE}}/$(jq -r '.blueprint.slug' package.json)"
       IMAGE_TYPE:
         sh: echo "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
+      MAJOR_VERSION:
+        sh: jq -r '.version' package.json | sed 's/\..*\..*$//'
       SLIM_COMMAND:
         sh: |
           COMMAND_TYPE="$(jq -r '.blueprint.dockerSlimCommand | type' package.json)"
@@ -86,19 +86,22 @@ tasks:
           fi
       SLUG:
         sh: jq -r '.blueprint.slug' package.json
+      TAG_POST: '{{if (contains "codeclimate" .CLI_ARGS)}}-codeclimate{{end}}'
+      VERSION:
+        sh: jq -r '.version' package.json
     log:
       error: Error building `{{.DOCKER_IMAGE}}:slim` with `docker-slim`
       start: Building Docker container named `{{.DOCKER_IMAGE}}:slim`
       success: Successfully built Docker container named `{{.DOCKER_IMAGE}}:slim`
     cmds:
       - >
-        .config/log info 'Running `docker-slim build --tag {{.DOCKER_IMAGE}}:slim
-        {{if eq .REPOSITORY_SUBTYPE "codeclimate"}}--tag codeclimate/codeclimate-{{.SLUG}}:slim {{end}}
-        {{.SLIM_COMMAND | replace "'" "\""}} {{.DOCKER_IMAGE}}:latest`'
+        .config/log info 'Running `docker-slim build --tag {{.DOCKER_IMAGE}}:slim{{.TAG_POST}}
+        {{if (contains "codeclimate" .CLI_ARGS)}}--tag codeclimate/codeclimate-{{.SLUG}}:slim {{end}}
+        {{.SLIM_COMMAND | replace "'" "\""}} {{.DOCKER_IMAGE}}:latest{{.TAG_POST}}`'
       - >
-        docker-slim build --tag {{.DOCKER_IMAGE}}:slim
-        {{if eq .REPOSITORY_SUBTYPE "codeclimate"}}--tag codeclimate/codeclimate-{{.SLUG}}:slim {{end}}
-        {{.SLIM_COMMAND | replace "'" "\""}} {{.DOCKER_IMAGE}}:latest
+        docker-slim build --tag {{.DOCKER_IMAGE}}:slim{{.TAG_POST}}
+        {{if (contains "codeclimate" .CLI_ARGS)}}--tag codeclimate/codeclimate-{{.SLUG}}:slim {{end}}
+        {{.SLIM_COMMAND | replace "'" "\""}} {{.DOCKER_IMAGE}}:latest{{.TAG_POST}}
 
   slim:finish:
     deps:
@@ -108,13 +111,16 @@ tasks:
   slim:prettier:
     deps:
       - :install:npm:prettier
+    vars:
+      IMAGE_SLUG:
+        sh: echo "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
     log:
       error: Failed to format `slim.report.json` with Prettier
       start: Formatting `slim.report.json` with Prettier
       success: Formatted `slim.report.json` with Prettier
     cmds:
       - '{{.NPX_HANDLE}}prettier --write slim.report.json > /dev/null'
-      - mv slim.report.json docs/slim.report.json
+      - mv slim.report.json docs/slim.{{.IMAGE_SLUG}}.report.json
 
   slim:sizes:
     cmds:
@@ -131,6 +137,10 @@ tasks:
         sh: echo "{{.DOCKERHUB_PROFILE}}/{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
       SLUG:
         sh: echo "{{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}$(jq -r '.blueprint.slug' package.json){{end}}"
+    log:
+      error: Encountered error while generating compressed Docker image tar file
+      start: Generating compressed Docker image tar file(s)
+      success: Successfully generated compressed Docker image tar file(s)
     cmds:
       - |
         function zipUp() {

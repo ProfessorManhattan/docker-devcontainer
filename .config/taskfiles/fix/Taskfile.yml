@@ -77,40 +77,25 @@ tasks:
         --cache-location .cache/eslintcache --fix {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}}
 
   go:
+    deps:
+      - :install:software:go
+      - :install:software:golangci-lint
     desc: Fix Go with all available Go fixers
     summary: |
       # Auto-Fix Go Files
 
-      This task will attempt to auto-fix Go files with the following auto-fixers:
-
-      * [go]()
-
-      If you would like to skip auto-fixing on the whole project and instead auto-fix an
-      individual file, then you can do so by passing the file path as a CLI
-      parameter like so:
+      This task will attempt to auto-fix Go files with
+      [golangci-lint](https://golangci-lint.run/) which runs multiple linters all
+      defined in `.config/golangci-lint`.
 
       **Example auto-fixing an individual file:**
       `task fix:go -- path/filename.go`
+    log:
+      error: Encountered error while autofixing Go files
+      start: Auto-fixing Go files..
+      success: Successfully auto-fixed Go files
     cmds:
-      - task: go:fmt
-
-  go:fmt:
-    deps:
-      - :install:software:go
-    summary: |
-      # Auto-Fix Go Files with `gofmt`
-
-      Running this task will auto-format the Go code in the project with `gofmt`.
-      In addition to writing the files (via the `-w` flag), it also attempts to
-      simplify the files (via the `-s` flag).
-
-      By default, this task will format the entire project. However, you can target
-      specific files by passing the path of the `.go` file as a CLI argument.
-
-      **Example formatting specific file:**
-      `task fix:go:fmt -- path/to/file.go`
-    cmds:
-      - gofmt -s -w {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}}
+      - golangci-lint run -c .config/golangci.yml --fix{{if .CLI_ARGS}}{{.CLI_ARGS}}{{end}}
 
   js:
     cmds:
@@ -174,7 +159,7 @@ tasks:
 
   misc:
     deps:
-      - :install:python:requirements
+      - :install:pipx:pre-commit-hooks
     summary: |
       # Miscellaneous fixes
 
@@ -289,16 +274,17 @@ tasks:
     log:
       start: Running Prettier on {{if .CLI_ARGS}}`{{.CLI_ARGS}}`{{else}}project{{end}}
     cmds:
-      - |
-        {{.NPX_HANDLE}}prettier --ignore-path {{.PRETTIERIGNORE_CONFIG}} --write {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}} || EXIT_CODE=$?
-        if [ -n "$EXIT_CODE" ]; then
-          .config/log warn 'Failed to run `{{.NPX_HANDLE}}prettier` - falling back to `prettier`'
-          prettier --ignore-path {{.PRETTIERIGNORE_CONFIG}} --write {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}}
-        fi
+      - cmd: |
+          {{.NPX_HANDLE}}prettier --ignore-path {{.PRETTIERIGNORE_CONFIG}} --write {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}} || EXIT_CODE=$?
+          if [ -n "$EXIT_CODE" ]; then
+            .config/log warn 'Failed to run `{{.NPX_HANDLE}}prettier` - falling back to `prettier`'
+            prettier --ignore-path {{.PRETTIERIGNORE_CONFIG}} --write {{if .CLI_ARGS}}{{.CLI_ARGS}}{{else}}.{{end}}
+          fi
+        ignore_error: true
 
   python:
     deps:
-      - :install:python:requirements
+      - :install:pipx:black
     desc: Automatically format Python files using Black
     hide: '{{ne .REPOSITORY_TYPE "python"}}'
     summary: |
@@ -392,7 +378,7 @@ tasks:
 
   toml:
     deps:
-      - :install:python:requirements
+      - :install:pipx:toml-sort
     desc: Format `.toml` files by alphabetizing and flattening
     summary: |
       # Automatically format `.toml` files
@@ -412,7 +398,9 @@ tasks:
     cmds:
       - |
         {{if .CLI_ARGS}}
+        if [ -f '{{.CLI_ARGS}}' ]; then
           {{.PYTHON_HANDLE}}toml-sort -i --all {{.CLI_ARGS}}
+        fi
         {{else}}
           while read PATHH; do
             {{.PYTHON_HANDLE}}toml-sort -i --all "$PATHH"

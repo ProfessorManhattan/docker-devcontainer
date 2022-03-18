@@ -23,7 +23,6 @@ First of all, thanks for visiting this page 😊 ❤️ ! We are _stoked_ that y
   - [Updating the `.blueprint.json` File](#updating-the-blueprintjson-file)
 - [Creating a New Dockerfile Project](#creating-a-new-dockerfile-project)
 - [Testing](#testing)
-  - [Creating Test Cases](#creating-test-cases)
   - [Testing DockerSlim Builds](#testing-dockerslim-builds)
   - [Testing Web Apps](#testing-web-apps)
 - [Linting](#linting)
@@ -266,34 +265,17 @@ If you are creating a new Dockerfile project, you should first populate the `.bl
 
 ## Testing
 
-Testing is an **extremely important** part of contributing to this project. Before opening a merge request, **you must test all common use cases of the Docker image**. This should be relatively straight-forward. You should be able to run all of the commands described by `npm run info` successfully.
+Testing is an **extremely important** part of contributing to this project. Before opening a merge request, **you must test all common use cases of the Docker image**. The following chart details the types of tests, when they are required, and provides examples:
 
-### Creating Test Cases
+| Test Type                                                   | Test Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Required                                                | Example                                                                                                                   |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| **Docker.test.yml ContainerStructureTest**                  | If the project has a `Docker.test.yml` file defined, then a [ContainerStructureTest](https://github.com/GoogleContainerTools/container-structure-test) will be run on both the regular and slim build (if there is one). If there are not multiple build targets defined in the `Dockerfile`, then you should use this type of test (by naming the test `Docker.test.yml`). Ideally, you should leverage some sample project files which should be stored in a folder in the `test/` directory.             | Required when the Dockerfile has 1 build target         | [Example `Docker.test.yml`](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/blob/master/Docker.test.yml)  |
+| **Multiple Docker.target.test.yml ContainerStructureTests** | If the project has multiple build targets defined in the `Dockerfile`, then multiple ContainerStructureTests are required. Each one should be named `Docker.target.test.yml` where target is replaced with the build target name defined in the `Dockerfile`. This will also test both the regular and slim builds. Similar to the previous test type, it is preferrable to make use of test files stored in a directory in the `test/` directory.                                                          | Required when the Dockerfile has multiple build targets | [Example Repository](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint)                                          |
+| **`test-output` Tests**                                     | For each folder in the `test-output` directory, both the regular and slim build will be run in the directory. The container is run by running `docker run -it image:tag .`. If the console output of the regular build does not match the output of the slim build, then this test will fail. ContainerStructureTests are preferrable but this test type is provided for cases where ContainerStructureTests might not suite your needs.                                                                    | _Optional_                                              | _Coming soon.. maybe.._                                                                                                   |
+| **CodeClimate CLI Test**                                    | This test is unique to [CodeClimate Docker projects](https://gitlab.com/megabyte-labs/docker/codeclimate). For each folder in the `test/` directory that begins with `codeclimate`, the [CodeClimate CLI](https://docs.codeclimate.com/docs/command-line-interface) will run with options specified in the `lint:codeclimate` task. Before running the CodeClimate CLI, our `slim` custom versions of the CodeClimate engines will be pulled from DockerHub and then tagged as `codeclimate/engine:latest`. | Required for CodeClimate engine projects                | [Example `codeclimate` folder](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint/-/tree/master/test/codeclimate) |
+| **GitLab Runner Test**                                      | This test will ensure that the container can be run on GitLab CI by using a local instance of a [GitLab Runner](https://docs.gitlab.com/runner/). The GitLab Runner test simulates GitLab CI pipeline steps by running each stage defined in `.gitlab-ci.yml` that starts with `integration:`.                                                                                                                                                                                                              | Required for any project that might be run on GitLab CI | [Example `.gitlab-ci.yml`](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint/-/blob/master/.gitlab-ci.yml)       |
 
-`npm run test` will test several elements of the project. It will lint the Dockerfile, lint shell scripts, and run the file in `./slim_test/test.sh`. The test case, defined in `test.sh`, is mainly for testing that slim builds work as expected but should also be utilized across all of our Dockerfile projects. In a standard test for a project with a slim build, you should compare the output of a command run against a regular build and a test build. You can accomplish this by using code similar to the following:
-
-**`./slim_test/test.sh`**
-
-```bash
-#!/bin/bash
-
-cd ./slim_test/example || exit 1
-echo "Testing latest image"
-LATEST_OUTPUT=$(docker run -v "${PWD}:/work" -w /work megabytelabs/ansible-lint:latest ansible-lint)
-echo "Testing slim image"
-SLIM_OUTPUT=$(docker run -v "${PWD}:/work" -w /work megabytelabs/ansible-lint:slim ansible-lint)
-if [ "$LATEST_OUTPUT" == "$SLIM_OUTPUT" ]; then
-  echo "Slim image appears to be working"
-  exit 0
-else
-  echo "Slim image output differs from latest image output"
-  exit 1
-fi
-```
-
-**Note: The test.sh file is now created from a template. To make sure it gets generated, you should create the `slim_test/` folder in the root of the project and then run `bash .start.sh`. The template version of `test.sh` will recursively loop through all of the folders inside the `slim_test/` folder unlike the example above which only tests the `slim_test/example/` scenario.**
-
-The above script, combined with some dummy data in `slim_test/example/`, will properly validate that the slim build is working the same way the regular build is working. If no `slim_test/` folder exists in the root of the repository, then the test step will be removed from `package.json`. We prefer you create a test that validates that the container is working whenever possible but in some cases it might not be necessary especially when there is no slim version. For a full example of implementing a test, please see the [Ansible Lint repository](repository.project.ansiblelint).
+_Note: If you are interested in testing GitHub Actions, then you might be interested in [act](https://github.com/nektos/act). This is not integrated into our automated test flow but you can install it by running `task install:software:act`._
 
 ### Testing DockerSlim Builds
 

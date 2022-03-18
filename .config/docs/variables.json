@@ -62,6 +62,39 @@
   "company": "Megabyte LLC",
   "copyright": "2020-2021",
   "docker_label_authors": "Brian Zalewski <brian@megabyte.space>",
+  "docker_tests": [
+    ["Test Type", "Test Description", "Required", "Example"],
+    [
+      "**Docker.test.yml ContainerStructureTest**",
+      "If the project has a `Docker.test.yml` file defined, then a [ContainerStructureTest](https://github.com/GoogleContainerTools/container-structure-test) will be run on both the regular and slim build (if there is one). If there are not multiple build targets defined in the `Dockerfile`, then you should use this type of test (by naming the test `Docker.test.yml`). Ideally, you should leverage some sample project files which should be stored in a folder in the `test/` directory.",
+      "Required when the Dockerfile has 1 build target",
+      "[Example `Docker.test.yml`](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/blob/master/Docker.test.yml)"
+    ],
+    [
+      "**Multiple Docker.target.test.yml ContainerStructureTests**",
+      "If the project has multiple build targets defined in the `Dockerfile`, then multiple ContainerStructureTests are required. Each one should be named `Docker.target.test.yml` where target is replaced with the build target name defined in the `Dockerfile`. This will also test both the regular and slim builds. Similar to the previous test type, it is preferrable to make use of test files stored in a directory in the `test/` directory.",
+      "Required when the Dockerfile has multiple build targets",
+      "[Example Repository](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint)"
+    ],
+    [
+      "**`test-output` Tests**",
+      "For each folder in the `test-output` directory, both the regular and slim build will be run in the directory. The container is run by running `docker run -it image:tag .`. If the console output of the regular build does not match the output of the slim build, then this test will fail. ContainerStructureTests are preferrable but this test type is provided for cases where ContainerStructureTests might not suite your needs.",
+      "*Optional*",
+      "*Coming soon.. maybe..*"
+    ],
+    [
+      "**CodeClimate CLI Test**",
+      "This test is unique to [CodeClimate Docker projects](https://gitlab.com/megabyte-labs/docker/codeclimate). For each folder in the `test/` directory that begins with `codeclimate`, the [CodeClimate CLI](https://docs.codeclimate.com/docs/command-line-interface) will run with options specified in the `lint:codeclimate` task. Before running the CodeClimate CLI, our `slim` custom versions of the CodeClimate engines will be pulled from DockerHub and then tagged as `codeclimate/engine:latest`.",
+      "Required for CodeClimate engine projects",
+      "[Example `codeclimate` folder](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint/-/tree/master/test/codeclimate)"
+    ],
+    [
+      "**GitLab Runner Test**",
+      "This test will ensure that the container can be run on GitLab CI by using a local instance of a [GitLab Runner](https://docs.gitlab.com/runner/). The GitLab Runner test simulates GitLab CI pipeline steps by running each stage defined in `.gitlab-ci.yml` that starts with `integration:`.",
+      "Required for any project that might be run on GitLab CI",
+      "[Example `.gitlab-ci.yml`](https://gitlab.com/megabyte-labs/docker/codeclimate/eslint/-/blob/master/.gitlab-ci.yml)"
+    ]
+  ],
   "docs": {
     "header_description_post": "<i></i>",
     "header_description_pre": "<i></i>",
@@ -120,6 +153,113 @@
     "tinypng": "https://tinypng.com/"
   },
   "name": "[[ package.json .blueprint.name - See CONTRIBUTING.md ]]",
+  "newProjectTemplates": {
+    "angular-app": {
+      "group": "angular",
+      "subgroup": "app",
+      "title": "Angular App"
+    },
+    "angular-website": {
+      "group": "angular",
+      "subgroup": "website",
+      "title": "Angular Website"
+    },
+    "ansible-role": {
+      "group": "ansible",
+      "subgroup": "role",
+      "title": "Ansible Role"
+    },
+    "docker-app": {
+      "group": "docker",
+      "subgroup": "app",
+      "title": "Dockerfile (App)"
+    },
+    "docker-ci-pipeline": {
+      "group": "docker",
+      "subgroup": "ci-pipeline",
+      "title": "CI/CD Pipeline Dockerfile"
+    },
+    "docker-codeclimate": {
+      "group": "docker",
+      "subgroup": "codeclimate",
+      "title": "CodeClimate Engine / Linter Dockerfile"
+    },
+    "docker-docker-compose": {
+      "group": "docker",
+      "subgroup": "docker-compose",
+      "title": "Docker Compose"
+    },
+    "go-cli": {
+      "group": "go",
+      "subgroup": "cli",
+      "title": "Go CLI"
+    },
+    "go-library": {
+      "group": "go",
+      "subgroup": "library",
+      "title": "Go Library"
+    },
+    "misc": {
+      "group": "misc",
+      "subgroup": "misc",
+      "title": "Miscellaneous project"
+    },
+    "npm-app": {
+      "group": "npm",
+      "subgroup": "app",
+      "title": "Node.js App"
+    },
+    "npm-cli": {
+      "group": "npm",
+      "subgroup": "cli",
+      "title": "Node.js CLI"
+    },
+    "npm-configs": {
+      "group": "npm",
+      "subgroup": "configs",
+      "title": "NPM Config Package"
+    },
+    "npm-library": {
+      "group": "npm",
+      "subgroup": "library",
+      "title": "Node.js Library"
+    },
+    "npm-plugin": {
+      "group": "npm",
+      "subgroup": "plugin",
+      "title": "NPM Plugin"
+    },
+    "npm-web-component": {
+      "group": "npm",
+      "subgroup": "web-component",
+      "title": "Web Component"
+    },
+    "packer-desktop": {
+      "group": "packer",
+      "subgroup": "desktop",
+      "title": "Packer (Desktop)"
+    },
+    "packer-server": {
+      "group": "packer",
+      "subgroup": "server",
+      "title": "Packer (Server)"
+    },
+    "python-cli": {
+      "group": "python",
+      "subgroup": "cli",
+      "title": "Python CLI"
+    },
+    "python-library": {
+      "group": "python",
+      "subgroup": "library",
+      "title": "Python Library"
+    },
+    "website": {
+      "group": "npm",
+      "subgroup": "website",
+      "title": "Website"
+    }
+  },
   "npm_publish_config_access": "public",
   "npm_standard_version_prerelease": "git add --all",
   "npm_type": "module",

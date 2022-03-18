@@ -4,17 +4,17 @@ Some of our repositories support creating a slim build via [DockerSlim](https://
 
 As a convenience feature, we include a command defined in `package.json` that should build the slim image. Just run `task docker:build` after running `npm i` (or `bash start.sh` if you do not have `Node.js` installed) in the root of this repository to build both the `latest` and `slim` builds.
 
-To build and publish a `slim` Dockerfile to Docker Hub, you can use the following as a starting point:
+To build and publish a `slim` Dockerfile to Docker Hub manually, you can use the following as a starting point:
 
 ```shell
 export DOCKERHUB_USERNAME=Your_DockerHub_Username_Here
 export DOCKERHUB_PASSWORD=Your_DockerHub_Password_Here
 docker login -u "$DOCKERHUB_USERNAME" -p "$DOCKERHUB_PASSWORD" docker.io
 docker build -t "$DOCKERHUB_USERNAME/{{ slug }}:latest" .
-docker-slim build --tag $DOCKERHUB_USERNAME/{{ slug }}:slim {{dockerSlimCommand}} $DOCKERHUB_USERNAME/{{ slug }}:latest
+docker-slim build --tag $DOCKERHUB_USERNAME/{{ slug }}:slim {{#if (eq (typeOf dockerSlimCommand) "string")}}{{dockerSlimCommand}}{{/if}}{{#if (not (eq (typeOf dockerSlimCommand) "string"))}}{{dockerSlimCommand[slug]}}{{/if}} $DOCKERHUB_USERNAME/{{ slug }}:latest
 docker push "$DOCKERHUB_USERNAME/{{ slug }}:slim"
 ```
 
-It may be possible to modify the DockerSlim command above to fix an issue or reduce the footprint even more than our command. You can modify the slim build command inline in the `package.json` file under `blueprint.dockerSlimCommand`.
+It may be possible to modify the DockerSlim command above to fix an issue or reduce the footprint even more than our command. You can modify the slim build command inline in the `package.json` file under `blueprint.dockerSlimCommand`. Some of our repositories have multiple build targets in the `Dockerfile` so those repositories will have multiple `dockerSlimCommands`.
 
 If you come up with an improvement, please do [open a pull request]({{ repository.group.dockerCodeClimate}}/{{ slug }}/-/issues/new). And again, make sure you replace `DOCKERHUB_USERNAME` and `DOCKERHUB_PASSWORD` in the snippet above with your Docker Hub username and password. The commands in the snippet above will build the slim Docker image and upload it to [Docker Hub](https://hub.docker.com/) where it will be publicly accessible.

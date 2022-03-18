@@ -122,7 +122,7 @@
       "command": "bash .config/scripts/start.sh && task docker:test:container-structure-test"
     },
     {
-      "label": "(docker:test:output): For each project in the `test-output/` folder, ensure slim and latest output match with default command",
+      "label": "(docker:test:output): For each folder matching `./test/output*`, ensure slim and latest output match with default command",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task docker:test:output"
     },
@@ -212,6 +212,11 @@
       "command": "bash .config/scripts/start.sh && task git:remove:submodules"
     },
     {
+      "label": "(go:test:convey): Run tests through the browser with GoConvey",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task go:test:convey"
+    },
+    {
       "label": "(group:exec): Execute group commands on any GitLab group (including repositories in sub-groups)",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task group:exec"
@@ -277,7 +282,7 @@
       "command": "bash .config/scripts/start.sh && task lint:eslint:warn-all"
     },
     {
-      "label": "(lint:go): Lint Go with all available Go linters",
+      "label": "(lint:go): Lint Go with `golangci-lint`",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task lint:go"
     },
@@ -350,6 +355,11 @@
       "label": "(nest:benchmark): Initiate a web server benchmarking session (with `clinic`)",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task nest:benchmark"
+    },
+    {
+      "label": "(new:project): Create a new project",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task new:project"
     },
     {
       "label": "(npm:build): Build the application",
@@ -537,6 +547,11 @@
       "command": "bash .config/scripts/start.sh && task publish:opera:release"
     },
     {
+      "label": "(pull:upstream): Pull from upstream repositories",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task pull:upstream"
+    },
+    {
       "label": "(python:build): Build the project",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task python:build"
@@ -627,7 +642,7 @@
       "command": "bash .config/scripts/start.sh && task shell"
     },
     {
-      "label": "(start): Set up the project and refresh it with the latest changes",
+      "label": "(start): Start the project by installing / updating dependencies, repairing issues, and opening a tutorial",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task start"
     },
@@ -642,9 +657,24 @@
       "command": "bash .config/scripts/start.sh && task symlink:role"
     },
     {
+      "label": "(synchronize): Set up the project and refresh it with the latest changes",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task synchronize"
+    },
+    {
+      "label": "(tag:deps): Inject a new command in the `Taskfile.yml` that includes all tasks matching a given tag as deps",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task tag:deps"
+    },
+    {
       "label": "(test): Open an interactive dialog to select and run a Molecule test",
       "type": "shell",
       "command": "bash .config/scripts/start.sh && task test"
+    },
+    {
+      "label": "(update): Fully update the repository",
+      "type": "shell",
+      "command": "bash .config/scripts/start.sh && task update"
     },
     {
       "label": "(vagrant:up): Select which virtualization platform to run the image on using an interactive prompt",
