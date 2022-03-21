@@ -13,6 +13,7 @@ tasks:
   bundle:
     deps:
       - bin
+      - goofys
       - goreleaser
       - minio
       - nfpm
