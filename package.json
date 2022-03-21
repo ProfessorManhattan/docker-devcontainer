@@ -130,6 +130,10 @@
       "url": "https://www.patreon.com/ProfessorManhattan"
     }
   ],
+  "jscpd": {
+    "gitignore": true,
+    "threshold": 0.1
+  },
   "lint-staged": {
     "(Brewfile|composer.lock|Gemfile|Gopkg.lock|Pipfile.lock)": [
       "task fix:prettier --"
