@@ -9,6 +9,14 @@ tasks:
         vars:
           PACKAGE: autocannon
 
+  bitwarden:
+    run: once
+    cmds:
+      - task: install:npm
+        vars:
+          BIN_NAME: bw
+          PACKAGE: '@bitwarden/cli'
+
   bundle:
     cmds:
       - task: :install:modules:global
@@ -35,6 +43,8 @@ tasks:
           BIN_NAME: git-cz
           FORCE_INSTALL: true
           PACKAGE: commitizen
+    status:
+      - '[ -n "$CI" ]'
 
   commitlint:
     run: once
@@ -43,6 +53,8 @@ tasks:
         vars:
           BIN_NAME: commitlint
           PACKAGE: '@commitlint/cli'
+    status:
+      - '[ -n "$CI" ]'
 
   cspell:
     run: once
