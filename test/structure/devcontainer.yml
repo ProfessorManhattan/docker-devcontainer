@@ -1,0 +1,46 @@
+---
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: Brew -> go version
+    command: go version
+    exitCode: 0
+  - name: NPM -> pnpm --version
+    command: pnpm --version
+    exitCode: 0
+  - name: PIPX -> ansible --version
+    command: ansible --version
+    exitCode: 0
+  - name: DIND
+    command: docker run hello-world
+    exitCode: 0
+    expectedOutput: ['.*Hello from Docker!.*']
+  - name: ZSH
+    command: which zsh
+    exitCode: 0
+  - name: Go -> goreleaser --version
+    command: goreleaser --version
+    exitCode: 0
+  - name: Rust -> catfs --version
+    command: catfs --version
+    exitCode: 0
+  - name: GitHub -> docker pushrm --help
+    command: docker pushrm --help
+    exitCode: 0
+    expectedOutput: ['.*Creating a README file.*']
+  - name: SSHD
+    command: ssh -p 2222 -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o GlobalKnownHostsFile=/dev/null megabyte@localhost 'exit 0'
+    exitCode: 0
+  - name: VNC Desktop
+    command: echo "$PASSWORD" | vncviewer -autopass localhost:5901
+    exitCode: 0
+
+metadataTest:
+  labels:
+    - key: maintainer
+      value: Megabyte Labs <help@megabyte.space>
+    - key: space.megabyte.type
+      value: software
+  volumes: [/work]
+  workdir: /work
+  user: megabyte

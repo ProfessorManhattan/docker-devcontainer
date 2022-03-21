@@ -1,7 +1,7 @@
 {
   "private": false,
   "name": "@megabytelabs/devcontainer",
-  "version": "0.0.3",
+  "version": "0.0.1",
   "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
   "license": "MIT",
   "author": "Brian Zalewski <brian@megabyte.space> (https://megabyte.space)",
@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "build": "bash start.sh && task docker:build",
+    "postbuild": "task install:npm:devcontainer && devcontainer build",
     "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
     "commit": "bash start.sh && task commit",
     "fix": "bash start.sh && task fix",
@@ -88,7 +89,8 @@
     },
     "slug": "devcontainer",
     "subgroup": "software",
-    "title": "An All-in-One DevContainer Environment for Rapid Development"
+    "title": "An All-in-One DevContainer Environment for Rapid Development",
+    "versionCommand": "echo '0.0.1'"
   },
   "changelog": {
     "displayTypes": [

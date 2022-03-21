@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM ubuntu:focal AS devcontainer
 
 ARG DOCKER_VERSION="latest"
 ARG ENABLE_NONROOT_DOCKER="true"
@@ -18,66 +18,86 @@ ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 ENV NOVNC_PORT="6080"
 ENV OSTYPE="linux-gnu"
-ENV PATH=${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:${PATH}
+
 ENV VNC_DPI="96"
 ENV VNC_PORT="5901"
 ENV VNC_RESOLUTION="1440x768x16"
 
-VOLUME ["/work"]
 WORKDIR /work
 
 COPY scripts/*.sh /tmp/scripts/
+COPY bin/ /usr/local/bin/
 COPY local/initctl start.sh local/Brewfile .config Taskfile.yml ./
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 RUN set -ex \
   && apt-get update \
-    && apt-get upgrade -y \
-    && bash /tmp/scripts/common.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true"
-RUN bash /tmp/scripts/desktop.sh "${USERNAME}" "${PASSWORD}" "true" "${VNC_PORT}" "${NOVNC_PORT}"
-RUN bash /tmp/scripts/dind.sh "${ENABLE_NONROOT_DOCKER}" "${USERNAME}" "${USE_MOBY}" "${DOCKER_VERSION}"
-RUN bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true"
-RUN apt-get install -y --no-install-recommends build-essential sshfs systemd systemd-cron systemd-sysv
-RUN apt-get clean \
-    && rm -Rf /usr/share/doc \
-      /usr/share/man \
-      /tmp/* \
-      /var/tmp/* \
-    && rm -rf /sbin/initctl \
-    && mv initctl /sbin/initctl \
-    && rm -rf /var/lib/apt/lists/* \
-    && cd /lib/systemd/system/sysinit.target.wants/ \
-    && ls | grep -v systemd-tmpfiles-setup | xargs rm -f "$1" \
-    && rm -f /lib/systemd/system/multi-user.target.wants/* \
-      /etc/systemd/system/*.wants/* \
-      /lib/systemd/system/local-fs.target.wants/* \
-      /lib/systemd/system/sockets.target.wants/*udev* \
-      /lib/systemd/system/sockets.target.wants/*initctl* \
-      /lib/systemd/system/basic.target.wants/* \
-      /lib/systemd/system/anaconda.target.wants/* \
-      /lib/systemd/system/plymouth* \
-      /lib/systemd/system/systemd-update-utmp* \
-      /lib/systemd/system/systemd*udev* \
-      /lib/systemd/system/getty.target
+  && apt-get upgrade -y \
+  && bash /tmp/scripts/common.sh "${INSTALL_ZSH}" "${USERNAME}" "${USER_UID}" "${USER_GID}" "${UPGRADE_PACKAGES}" "true" "true" \
+  && bash /tmp/scripts/desktop.sh "${USERNAME}" "${PASSWORD}" "true" "${VNC_PORT}" "${NOVNC_PORT}" \
+  && bash /tmp/scripts/dind.sh "${ENABLE_NONROOT_DOCKER}" "${USERNAME}" "${USE_MOBY}" "${DOCKER_VERSION}" \
+  && bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true" \
+  && apt-get install -y --no-install-recommends \
+  build-essential \
+  golang \
+  jo \
+  jq \
+  libnss3-tools \
+  rsync \
+  sshfs \
+  sshpass \
+  systemd \
+  systemd-cron \
+  systemd-sysv \
+  && apt-get clean \
+  && rm -rf \
+  /usr/share/doc \
+  /usr/share/man \
+  /tmp/* \
+  /var/tmp/* \
+  /var/lib/apt/lists/* \
+  /sbin/initctl \
+  && mv initctl /sbin/initctl \
+  && rm -rf /var/lib/apt/lists/* \
+  && cd /lib/systemd/system/sysinit.target.wants/ \
+  && ls | grep -v systemd-tmpfiles-setup | xargs rm -f "$1" \
+  && rm -f /lib/systemd/system/multi-user.target.wants/* \
+  /etc/systemd/system/*.wants/* \
+  /lib/systemd/system/local-fs.target.wants/* \
+  /lib/systemd/system/sockets.target.wants/*udev* \
+  /lib/systemd/system/sockets.target.wants/*initctl* \
+  /lib/systemd/system/basic.target.wants/* \
+  /lib/systemd/system/anaconda.target.wants/* \
+  /lib/systemd/system/plymouth* \
+  /lib/systemd/system/systemd-update-utmp* \
+  /lib/systemd/system/systemd*udev* \
+  /lib/systemd/system/getty.target \
+  && curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
 
 USER megabyte
 
-RUN sudo chown -R "${USERNAME}:${USERNAME}" . \
-    && bash start.sh
-RUN brew install gcc
-RUN brew bundle install
-RUN task install:go:bundle \
-    && task install:rust:bundle
-RUN task install:github:bundle \
-    && task install:npm:bundle
-RUN task install:pipx:bundle \
-    && task install:apt:clean
-RUN curl -sSL https://sdk.cloud.google.com | bash
+ENV GOPATH="${HOME}/.local/go"
+ENV GOROOT="/home/linuxbrew/.linuxbrew/opt/go/libexec"
+ENV PATH=${GOPATH}/bin:${GOROOT}/bin:${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:${HOME}/.local/bin:${PATH}
 
-COPY local/package.json local/pyproject.toml ./
-
-RUN task install:python:requirements \
-    && task install:modules:local
+RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py > /tmp/get-poetry.py \
+  && python /tmp/get-poetry.py \
+  && rm /tmp/get-poetry.py \
+  && sudo chown -R "${USERNAME}:${USERNAME}" . \
+  && START=false bash start.sh \
+  && task \
+  install:apt:azure-cli \
+  install:apt:gcloud \
+  install:apt:gitlab-runner \
+  install:apt:helm \
+  install:apt:kubectl \
+  install:apt:node \
+  install:apt:python \
+  install:apt:waypoint \
+  install:go:bundle \
+  install:npm:bundle \
+  install:pipx:bundle \
+  install:rust:bundle
 
 VOLUME ["/var/lib/docker"]
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]
