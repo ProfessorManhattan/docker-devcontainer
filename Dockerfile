@@ -27,7 +27,7 @@ WORKDIR /work
 
 COPY scripts/*.sh /tmp/scripts/
 COPY bin/ /usr/local/bin/
-COPY local/initctl start.sh local/Brewfile .config Taskfile.yml ./
+COPY local/initctl start.sh .config Taskfile.yml ./
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 RUN set -ex \
@@ -80,10 +80,7 @@ ENV GOPATH="${HOME}/.local/go"
 ENV GOROOT="/home/linuxbrew/.linuxbrew/opt/go/libexec"
 ENV PATH=${GOPATH}/bin:${GOROOT}/bin:${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:${HOME}/.local/bin:${PATH}
 
-RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py > /tmp/get-poetry.py \
-  && python /tmp/get-poetry.py \
-  && rm /tmp/get-poetry.py \
-  && sudo chown -R "${USERNAME}:${USERNAME}" . \
+RUN sudo chown -R "${USERNAME}:${USERNAME}" . \
   && START=false bash start.sh \
   && task \
   install:apt:azure-cli \
@@ -97,7 +94,8 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
   install:go:bundle \
   install:npm:bundle \
   install:pipx:bundle \
-  install:rust:bundle
+  install:rust:bundle \
+  install:software:poetry
 
 VOLUME ["/var/lib/docker"]
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]

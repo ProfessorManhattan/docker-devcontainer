@@ -78,6 +78,7 @@
   },
   "blueprint": {
     "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+    "dockerBaseTag": "devcontainer",
     "github_id": "R_kgDOG31-vQ",
     "gitlab_group_id": "11773364",
     "gitlab_project_id": "33871141",
