@@ -80,7 +80,8 @@ ENV GOPATH="${HOME}/.local/go"
 ENV GOROOT="/home/linuxbrew/.linuxbrew/opt/go/libexec"
 ENV PATH=${GOPATH}/bin:${GOROOT}/bin:${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:${HOME}/.local/bin:${PATH}
 
-RUN sudo chown -R "${USERNAME}:${USERNAME}" . \
+RUN set -ex \
+  && sudo chown -R "${USERNAME}:${USERNAME}" . \
   && START=false bash start.sh \
   && task \
   install:apt:azure-cli \
