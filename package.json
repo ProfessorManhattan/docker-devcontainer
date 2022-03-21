@@ -21,6 +21,7 @@
     "dist/"
   ],
   "scripts": {
+    "prebuild": "task install:gh:act install:gh:bat install:gh:croc install:gh:dasel install:gh:direnv install:gh:dive install:gh:dockle install:gh:ffsend install:gh:fusion install:gh:gh install:gh:gitleaks install:gh:glab install:gh:kubectx install:gh:mkcert install:gh:oq install:gh:task install:gh:tokei install:gh:trivy install:gh:up install:gh:yq",
     "build": "bash start.sh && task docker:build",
     "postbuild": "task install:npm:devcontainer && devcontainer build",
     "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
