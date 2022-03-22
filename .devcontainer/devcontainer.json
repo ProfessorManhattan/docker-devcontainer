@@ -1,14 +1,4 @@
 {
-  "build": {
-    "args": {
-      "DOCKER_VERSION": "latest",
-      "ENABLE_NONROOT_DOCKER": "true",
-      "INSTALL_ZSH": "true",
-      "UPGRADE_PACKAGES": "true",
-      "USERNAME": "megabyte",
-      "USE_MOBY": "true"
-    }
-  },
   "dockerFile": "Dockerfile",
   "extensions": [
     "Angular.ng-template",
@@ -87,7 +77,7 @@
   },
   "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
   "name": "Megabyte Labs DevContainer Code Rocket Pack",
-  "postCreateCommand": "type -f start.sh && bash start.sh || true",
+  "postCreateCommand": "type -f start.sh && (bash start.sh || true)",
   "remoteUser": "megabyte",
   "runArgs": ["--init", "--privileged", "--shm-size=4g"],
   "settings": {}
