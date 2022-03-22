@@ -2,7 +2,7 @@
   "private": false,
   "name": "@megabytelabs/devcontainer",
   "version": "0.0.1",
-  "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+  "description": "The Docker-based, DevContainer development environment for multi-language projects",
   "license": "MIT",
   "author": "Brian Zalewski <brian@megabyte.space> (https://megabyte.space)",
   "homepage": "https://megabyte.space",
@@ -104,7 +104,9 @@
     "showAuthor": true
   },
   "commitlint": {
-    "extends": [],
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
   "engine": "node >= 0.12.4",

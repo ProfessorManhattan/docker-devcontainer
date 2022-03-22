@@ -128,7 +128,7 @@ ARG VERSION
 LABEL maintainer="Megabyte Labs <help@megabyte.space>"
 LABEL org.opencontainers.image.authors="Brian Zalewski <brian@megabyte.space>"
 LABEL org.opencontainers.image.created=$BUILD_DATE
-LABEL org.opencontainers.image.description="The DevContainer Docker-based development environment for Megabyte Labs projects"
+LABEL org.opencontainers.image.description="The Docker-based, DevContainer development environment for multi-language projects"
 LABEL org.opencontainers.image.documentation="https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/README.md"
 LABEL org.opencontainers.image.licenses="MIT"
 LABEL org.opencontainers.image.revision=$REVISION
