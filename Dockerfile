@@ -18,6 +18,7 @@ ENV LANG="en_US.UTF-8"
 ENV LANGUAGE="en_US.UTF-8"
 ENV NOVNC_PORT="6080"
 ENV OSTYPE="linux-gnu"
+ENV PATH="$PATH:/usr/local/go/bin"
 
 ENV VNC_DPI="96"
 ENV VNC_PORT="5901"
@@ -27,7 +28,7 @@ WORKDIR /work
 
 COPY scripts/*.sh /tmp/scripts/
 COPY bin/ /usr/local/bin/
-COPY local/initctl start.sh .config Taskfile.yml ./
+COPY local/initctl ./
 
 SHELL ["/bin/bash", "-eo", "pipefail", "-c"]
 RUN set -ex \
@@ -39,13 +40,22 @@ RUN set -ex \
   && bash /tmp/scripts/sshd.sh "2222" "${USERNAME}" "false" "${PASSWORD}" "true" \
   && apt-get install -y --no-install-recommends \
   build-essential \
-  golang \
+  curl \
+  file \
+  gcc \
+  git \
+  grep \
+  gzip \
   jo \
   jq \
   libnss3-tools \
+  make \
+  procps \
   rsync \
+  ruby \
   sshfs \
   sshpass \
+  sudo \
   systemd \
   systemd-cron \
   systemd-sysv \
@@ -72,31 +82,38 @@ RUN set -ex \
   /lib/systemd/system/systemd-update-utmp* \
   /lib/systemd/system/systemd*udev* \
   /lib/systemd/system/getty.target \
-  && curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash -
+  && curl -sL https://raw.githubusercontent.com/docker-slim/docker-slim/master/scripts/install-dockerslim.sh | sudo -E bash - \
+  && curl -sSL https://golang.org/dl/go1.18.linux-amd64.tar.gz > /tmp/go.tar.gz \
+  && tar -C /usr/local -xzf /tmp/go.tar.gz
 
 USER megabyte
 
-ENV GOPATH="${HOME}/.local/go"
-ENV GOROOT="/home/linuxbrew/.linuxbrew/opt/go/libexec"
-ENV PATH=${GOPATH}/bin:${GOROOT}/bin:${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:${HOME}/.local/bin:${PATH}
+WORKDIR /home/megabyte
+
+ENV GOPATH="/home/megabyte/.local/go"
+ENV PATH=${GOPATH}/bin:${BREW_PREFIX}/sbin:${BREW_PREFIX}/bin:/home/megabyte/.local/bin:/home/megabyte/.cargo/bin:${PATH}
+
+COPY start.sh .config Taskfile.yml ./
 
 RUN set -ex \
   && sudo chown -R "${USERNAME}:${USERNAME}" . \
+  && mkdir -p ~/.local/bin ~/.local/go ~/.cargo/bin \
+  && curl https://sh.rustup.rs -sSf | sh -s -- -y \
   && START=false bash start.sh \
   && task \
-  install:apt:azure-cli \
-  install:apt:gcloud \
   install:apt:gitlab-runner \
   install:apt:helm \
   install:apt:kubectl \
   install:apt:node \
   install:apt:python \
-  install:apt:waypoint \
-  install:go:bundle \
+  install:apt:waypoint
+
+RUN mkdir -p "$HOME/.local/go" &&task install:go:bundle \
   install:npm:bundle \
   install:pipx:bundle \
   install:rust:bundle \
-  install:software:poetry
+  install:software:poetry \
+  && rm -rf *
 
 VOLUME ["/var/lib/docker"]
 VOLUME ["/sys/fs/cgroup", "/tmp", "/run"]

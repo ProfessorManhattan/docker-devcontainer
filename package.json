@@ -77,7 +77,7 @@
     "access": "public"
   },
   "blueprint": {
-    "description": "The DevContainer Docker-based development environment for Megabyte Labs projects",
+    "description": "The Docker-based, DevContainer development environment for multi-language projects",
     "dockerBaseTag": "devcontainer",
     "github_id": "R_kgDOG31-vQ",
     "gitlab_group_id": "11773364",
@@ -91,8 +91,7 @@
     },
     "slug": "devcontainer",
     "subgroup": "software",
-    "title": "An All-in-One DevContainer Environment for Rapid Development",
-    "versionCommand": "echo '0.0.1'"
+    "title": "An All-in-One DevContainer Environment for Rapid Development"
   },
   "changelog": {
     "displayTypes": [
@@ -105,9 +104,7 @@
     "showAuthor": true
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
+    "extends": [],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
   "engine": "node >= 0.12.4",
