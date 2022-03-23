@@ -160,6 +160,13 @@ vars:
       elif type pnpm &> /dev/null; then
         echo 'pnpm '
       fi
+  NPX_PACKAGE:
+    sh: |
+      if type pnpx &> /dev/null; then
+        echo 'pnpx'
+      elif type pnpm &> /dev/null; then
+        echo 'pnpm'
+      fi
   PROJECT_TYPE:
     sh: |
       if type jq &> /dev/null && [ -f package.json ]; then VER="$(jq -r '.blueprint.group' package.json)"; if [ "$VER" == 'null' ]; then echo TYPE="$GROUP_TYPE"; else TYPE="$VER"; fi; else TYPE="$GROUP_TYPE"; fi
@@ -190,13 +197,6 @@ vars:
     sh: if type jq &> /dev/null && [ -f package.json ]; then VER="$(jq -r .blueprint.group package.json)"; if [ "$VER" == null ]; then echo "$GROUP_TYPE"; else echo "$VER"; fi; else echo "$GROUP_TYPE"; fi
   SEMANTIC_CONFIG: semantic-release-config
   TIMEZONE: America/New_York
-  NPX_PACKAGE:
-    sh: |-
-      if type pnpx &> /dev/null; then
-        echo 'pnpx'
-      elif type pnpm &> /dev/null; then
-        echo 'pnpm'
-      fi
   includes:
     common:start: ./.config/taskfiles/common/Taskfile-start.yml
 env:
@@ -210,10 +210,8 @@ env:
     sh: if [ -n "$CI" ]; then echo 'true'; fi
   SENTRY_DSN:
     sh: |
-      if type jq &> /dev/null; then
-        DSN="$(jq -r '.blueprint.sentryDSN' package.json)"
-        if [ "$DSN" != 'null' ]; then echo "$DSN"; fi
-      fi
+      DSN="$(jq -r '.blueprint.sentryDSN' package.json)"
+      if [ "$DSN" != 'null' ]; then echo "$DSN"; fi
 profile: |
   PATH="$PATH:$HOME/.local/bin:$HOME/.poetry/bin"
   if [[ "$OSTYPE" == 'linux-gnu'* ]] || [[ "$OSTYPE" == 'linux-musl'* ]]; then
