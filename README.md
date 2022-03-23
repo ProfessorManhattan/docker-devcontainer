@@ -101,7 +101,7 @@ You can also add a bash alias to your `~/.bashrc` file so that you can run the p
 
 ```shell
 docker_command_alias() {
-  docker run -v ${PWD}:/work -w /work megabytelabs/devcontainer:preferred_tag "$@"
+    docker run -v ${PWD}:/work -w /work megabytelabs/devcontainer:preferred_tag "$@"
 }
 ```
 

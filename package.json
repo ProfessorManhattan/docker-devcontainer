@@ -1,5 +1,81 @@
 {
+  "private": false,
+  "name": "@megabytelabs/devcontainer",
+  "version": "0.0.1",
+  "description": "The Docker-based, DevContainer development environment for multi-language projects",
+  "license": "MIT",
   "author": "Brian Zalewski <brian@megabyte.space> (https://megabyte.space)",
+  "homepage": "https://megabyte.space",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ProfessorManhattan/docker-devcontainer.git"
+  },
+  "bugs": {
+    "email": "help@megabyte.space",
+    "url": "https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/issues"
+  },
+  "type": "commonjs",
+  "main": "dist/main.js",
+  "files": [
+    "bin/",
+    "dist/"
+  ],
+  "scripts": {
+    "prebuild": "task install:gh:act install:gh:bat install:gh:croc install:gh:dasel install:gh:deno install:gh:direnv install:gh:dive install:gh:dockle install:gh:ffsend install:gh:fusion install:gh:gh install:gh:gitleaks install:gh:glab install:gh:kubectx install:gh:mkcert install:gh:oq install:gh:task install:gh:tokei install:gh:trivy install:gh:up install:gh:yq",
+    "build": "bash start.sh && task docker:build",
+    "postbuild": "task install:npm:devcontainer && devcontainer build",
+    "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
+    "commit": "bash start.sh && task commit",
+    "fix": "bash start.sh && task fix",
+    "help": "bash start.sh && task --menu",
+    "lint": "bash start.sh && task lint",
+    "preload": "bash start.sh && task preload",
+    "prepare": "bash start.sh && (test -f Taskfile.yml && task npm:prepare) || true",
+    "prepublishOnly": "test -z $SKIP_PREPUB && bash start.sh && task npm:bundle:create || true",
+    "release": "bash start.sh && task publish:semantic-release",
+    "repair": "bash <(curl -sS https://install.doctor/repair)",
+    "start": "test -z $SKIP_NPM_START && bash start.sh || true",
+    "test": "bash start.sh && task docker:test",
+    "unpack": "bash start.sh && task npm:bundle:unpack",
+    "update": "bash start.sh && task update"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/git-cz-emoji"
+    }
+  },
+  "typings": "dist/main.d.ts",
+  "dependencies": {},
+  "optionalDependencies": {},
+  "devDependencies": {
+    "@commitlint/config-conventional": "latest",
+    "eslint-config-strict-mode": "latest",
+    "git-cz-emoji": "latest",
+    "handlebars-helpers": "latest",
+    "prettier-config-sexy-mode": "latest",
+    "semantic-release-config": "latest",
+    "typescript": "^4.5.5"
+  },
+  "keywords": [
+    "codespaces",
+    "container",
+    "docker",
+    "dockerfile",
+    "github",
+    "mblabs",
+    "megabytelabs",
+    "professormanhattan",
+    "software",
+    "virtualization",
+    "washingtondc"
+  ],
+  "engines": {
+    "node": ">=14.18.0"
+  },
+  "publishConfig": {
+    "@megabyte:registry": "https://gitlab.com/api/v4/projects/33871141/packages/npm/",
+    "access": "public"
+  },
   "blueprint": {
     "description": "The Docker-based, DevContainer development environment for multi-language projects",
     "dockerBaseTag": "devcontainer",
@@ -17,10 +93,6 @@
     "subgroup": "software",
     "title": "An All-in-One DevContainer Environment for Rapid Development"
   },
-  "bugs": {
-    "email": "help@megabyte.space",
-    "url": "https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/issues"
-  },
   "changelog": {
     "displayTypes": [
       "feat",
@@ -32,29 +104,12 @@
     "showAuthor": true
   },
   "commitlint": {
-    "extends": [],
+    "extends": [
+      "@commitlint/config-conventional"
+    ],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/git-cz-emoji"
-    }
-  },
-  "dependencies": {},
-  "description": "The Docker-based, DevContainer development environment for multi-language projects",
-  "devDependencies": {
-    "eslint-config-strict-mode": "latest",
-    "git-cz-emoji": "latest",
-    "prettier-config-sexy-mode": "latest",
-    "semantic-release-config": "latest",
-    "typescript": "^4.5.5",
-    "@commitlint/config-conventional": "latest",
-    "handlebars-helpers": "latest"
-  },
   "engine": "node >= 0.12.4",
-  "engines": {
-    "node": ">=14.18.0"
-  },
   "eslintConfig": {
     "extends": "eslint-config-strict-mode",
     "ignorePatterns": [
@@ -64,10 +119,6 @@
     ],
     "rules": {}
   },
-  "files": [
-    "bin/",
-    "dist/"
-  ],
   "funding": [
     {
       "type": "opencollective",
@@ -78,25 +129,10 @@
       "url": "https://www.patreon.com/ProfessorManhattan"
     }
   ],
-  "homepage": "https://megabyte.space",
   "jscpd": {
     "gitignore": true,
     "threshold": 0.1
   },
-  "keywords": [
-    "codespaces",
-    "container",
-    "docker",
-    "dockerfile",
-    "github",
-    "mblabs",
-    "megabytelabs",
-    "professormanhattan",
-    "software",
-    "virtualization",
-    "washingtondc"
-  ],
-  "license": "MIT",
   "lint-staged": {
     "(Brewfile|composer.lock|Gemfile|Gopkg.lock|Pipfile.lock)": [
       "task fix:prettier --"
@@ -164,8 +200,6 @@
       "task image:compress --"
     ]
   },
-  "main": "dist/main.js",
-  "name": "@megabytelabs/devcontainer",
   "ntl": {
     "descriptions": {
       "build": "Builds the project using the build command specified under scripts in package.json",
@@ -184,7 +218,6 @@
       "update": "Update and refresh the repository with upstream changes and templated parts"
     }
   },
-  "optionalDependencies": {},
   "pnpm": {
     "allowedVersions": {
       "@typescript-eslint/eslint-plugin": "5",
@@ -204,11 +237,6 @@
     }
   },
   "prettier": "prettier-config-sexy-mode",
-  "private": false,
-  "publishConfig": {
-    "@megabyte:registry": "https://gitlab.com/api/v4/projects/33871141/packages/npm/",
-    "access": "public"
-  },
   "release": {
     "branches": [
       "main",
@@ -220,31 +248,5 @@
       }
     ],
     "extends": "semantic-release-config"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ProfessorManhattan/docker-devcontainer.git"
-  },
-  "scripts": {
-    "build": "bash start.sh && task docker:build",
-    "bump": "npm run build && npm version patch --no-commit-hooks --no-git-tag-version --force && npm publish",
-    "commit": "bash start.sh && task commit",
-    "fix": "bash start.sh && task fix",
-    "help": "bash start.sh && task --menu",
-    "lint": "bash start.sh && task lint",
-    "postbuild": "task install:npm:devcontainer && devcontainer build",
-    "prebuild": "task install:gh:act install:gh:bat install:gh:croc install:gh:dasel install:gh:deno install:gh:direnv install:gh:dive install:gh:dockle install:gh:ffsend install:gh:fusion install:gh:gh install:gh:gitleaks install:gh:glab install:gh:kubectx install:gh:mkcert install:gh:oq install:gh:task install:gh:tokei install:gh:trivy install:gh:up install:gh:yq",
-    "preload": "bash start.sh && task preload",
-    "prepare": "bash start.sh && (test -f Taskfile.yml && task npm:prepare) || true",
-    "prepublishOnly": "test -z $SKIP_PREPUB && bash start.sh && task npm:bundle:create || true",
-    "release": "bash start.sh && task publish:semantic-release",
-    "repair": "bash <(curl -sS https://install.doctor/repair)",
-    "start": "test -z $SKIP_NPM_START && bash start.sh || true",
-    "test": "bash start.sh && task docker:test",
-    "unpack": "bash start.sh && task npm:bundle:unpack",
-    "update": "bash start.sh && task update"
-  },
-  "type": "commonjs",
-  "typings": "dist/main.d.ts",
-  "version": "0.0.1"
+  }
 }

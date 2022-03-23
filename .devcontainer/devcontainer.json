@@ -44,7 +44,6 @@
     "memory": "4gb",
     "storage": "16gb"
   },
-  "overrideCommand": false,
   "mounts": ["source=dind-var-lib-docker,target=/var/lib/docker,type=volume"],
   "name": "Megabyte Labs Development Environment",
   "postCreateCommand": "type -f start.sh && (bash start.sh || true)",
