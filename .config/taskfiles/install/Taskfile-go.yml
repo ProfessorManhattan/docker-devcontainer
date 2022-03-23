@@ -13,7 +13,6 @@ tasks:
   bundle:
     deps:
       - bin
-      - golangci-lint
       - goreleaser
       - minio
       - nfpm
@@ -41,14 +40,6 @@ tasks:
         vars:
           BIN_NAME: goconvey
           PACKAGE: github.com/smartystreets/goconvey@latest
-
-  golangci-lint:
-    run: once
-    cmds:
-      - task: install:go
-        vars:
-          BIN_NAME: golangci-lint
-          PACKAGE: github.com/golangci/golangci-lint/cmd/golangci-lint@v1.45.0
 
   goofys:
     run: once
