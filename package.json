@@ -48,13 +48,13 @@
   "dependencies": {},
   "optionalDependencies": {},
   "devDependencies": {
-    "@commitlint/config-conventional": "latest",
     "eslint-config-strict-mode": "latest",
     "git-cz-emoji": "latest",
-    "handlebars-helpers": "latest",
     "prettier-config-sexy-mode": "latest",
     "semantic-release-config": "latest",
-    "typescript": "^4.5.5"
+    "typescript": "^4.5.5",
+    "@commitlint/config-conventional": "latest",
+    "handlebars-helpers": "latest"
   },
   "keywords": [
     "codespaces",
@@ -86,7 +86,7 @@
     "name": "Megabyte Labs DevContainer",
     "overview": "This project is home of the base Docker image used for provisioning [DevContainer environments](https://docs.github.com/en/codespaces/setting-up-your-project-for-codespaces/configuring-codespaces-for-your-project). A DevContainer environment is a Docker image that bundles common dependencies and build tools so that development environments can be easily spun up and transferred remotely. Both GitHub and VSCode have native support for DevContainers. This project borrows most of its' code from the [Microsoft vscode-dev-containers repository](https://github.com/microsoft/vscode-dev-containers/). After applying their base system changes:\n\n* A [Brewfile](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/Brewfile) is used to install software\n* A [global-package.json](https://github.com/ProfessorManhattan/docker-devcontainer/blob/master/.config/global-package.json) is used to install global NPM dependencies\n* The rest is handled somewhat dynamically by **[Bodega](https://github.com/ProfessorManhattan/Bodega)** and the `Taskfile.yml` that is present in all of our repositories",
     "repository": {
-      "github": "https://github.com/ProfessorManhattan/docker-devcontainer",
+      "github": "https://github.com/megabyte-labs/docker-devcontainer",
       "gitlab": "https://gitlab.com/megabyte-labs/docker/software/devcontainer"
     },
     "slug": "devcontainer",
@@ -104,9 +104,7 @@
     "showAuthor": true
   },
   "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ],
+    "extends": [],
     "helpUrl": "https://megabyte.space/docs/contributing/commits"
   },
   "engine": "node >= 0.12.4",
