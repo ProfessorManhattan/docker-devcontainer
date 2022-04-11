@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# shellcheck disable
+
 #-------------------------------------------------------------------------------------------------------------
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License. See https://go.microsoft.com/fwlink/?linkid=2090316 for license information.
@@ -124,7 +126,7 @@ tee /usr/local/share/ssh-init.sh > /dev/null \
 # This script is intended to be run as root with a container that runs as root (even if you connect with a different user)
 # However, it supports running as a user other than root if passwordless sudo is configured for that same user.
 
-set -e 
+set -e
 
 sudoIf()
 {
