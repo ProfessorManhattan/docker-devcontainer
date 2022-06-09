@@ -352,3 +352,5 @@ Instead of using `git commit`, we prefer that you use `npm run commit`. You will
 ### Pre-Commit Hook
 
 Even if you decide not to use `npm run commit`, you will see that `git commit` behaves differently because there is a pre-commit hook that installs automatically after you run `npm i` (or `bash .start.sh`). This pre-commit hook is there to test your code before committing and help you become a better coder. If you need to bypass the pre-commit hook, then you may add the `--no-verify` tag at the end of your `git commit` command (e.g. `git commit -m "Commit" --no-verify`).
+
+{{ load:.config/docs/common/contributing/troubleshooting.md }}
