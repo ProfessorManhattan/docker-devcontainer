@@ -10,28 +10,25 @@ First of all, thanks for visiting this page 😊 ❤️ ! We are _stoked_ that y
 
 - [Code of Conduct](#code-of-conduct)
 - [Overview](#overview)
+- [Style Guide](#style-guide)
 - [Philosophy](#philosophy)
   - [Choosing a Base Image](#choosing-a-base-image)
 - [Requirements](#requirements)
-  - [Optional Requirements](#optional-requirements)
+  - [Other Requirements](#other-requirements)
 - [Getting Started](#getting-started)
-  - [Descriptions of Build Scripts](#descriptions-of-build-scripts)
   - [Creating DockerSlim Builds](#creating-dockerslim-builds)
     - [How to Determine Which Paths to Include](#how-to-determine-which-paths-to-include)
     - [Determining Binary Dependencies](#determining-binary-dependencies)
   - [Using a `paths.txt` File](#using-a-pathstxt-file)
-  - [Updating the `.blueprint.json` File](#updating-the-blueprintjson-file)
-- [Creating a New Dockerfile Project](#creating-a-new-dockerfile-project)
 - [Testing](#testing)
   - [Testing DockerSlim Builds](#testing-dockerslim-builds)
   - [Testing Web Apps](#testing-web-apps)
 - [Linting](#linting)
-- [Updating Meta Files and Documentation](#updating-meta-files-and-documentation)
-  - [`.blueprint.json` and @appnest/readme](#blueprintjson-and-appnestreadme)
-  - [`logo.png`](#logopng)
 - [Pull Requests](#pull-requests)
-  - [How to Commit Code](#how-to-commit-code)
   - [Pre-Commit Hook](#pre-commit-hook)
+- [Style Guides](#style-guides)
+  - [Recommended Style Guides](#recommended-style-guides)
+  - [Strict Linting](#strict-linting)
 
 <a href="#code-of-conduct" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -47,8 +44,15 @@ All our Dockerfiles are created for specific tasks. In many cases, this allows u
 
 - **[Ansible Molecule](repository.group.dockerfile_ansible_molecule)** - Dockerfile projects used to generate pre-built Docker containers that are intended for use by Ansible Molecule
 - **[Apps](repository.group.dockerfile_apps)** - Full-fledged web applications
+- \*\*[CodeClimate](repository.group.codeclimate) - CodeClimate engines
 - **[CI Pipeline](repository.group.dockerfile_ci)** - Projects that include tools used during deployments such as linters and auto-formatters
 - **[Software](repository.group.dockerfile_software)** - Docker containers that are meant to replace software that is traditionally installed directly on hosts
+
+<a href="#style-guide" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
+
+## Style Guide
+
+In addition to reading through this guide, you should also read our [Docker Style Guide](https://gitlab.com/megabyte-labs/templates/docker) template repository which outlines implementation methods that allow us to manage a large number of Dockerfile projects using automated practices.
 
 <a href="#philosophy" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -78,13 +82,19 @@ Before getting started with development, you should ensure that the following re
 
 - **[Docker](repository.project.docker)**
 
-### Optional Requirements
+Although most requirements will automatically be installed when you use our build commands, Docker should be installed ahead of time because it usually requires a reboot.
 
-- [DockerSlim](repository.project.dockerslim) - Used for generating compact, secure images
-- [jq](repository.project.jq) - Used by `.start.sh` to interact with JSON documents from the bash shell
-- [Node.js](repository.project.node) (_Version >=10_) - Utilized to add development features like a pre-commit hook and other automations
+Getting started should be fairly straight-forward. All of our projects should include a file named `start.sh`. Simply run, `bash start.sh` to run a basic update on the repository. This should install most (if not all of the requirements).
 
-_Each of the requirements links to an Ansible Role that can install the dependency with a one-line bash script install._ Even if you do not have the optional dependencies installed, the `.start.sh` script (which is called by many of our build tool sequences) will attempt to install missing dependencies to the `~/.local/bin` folder.
+### Other Requirements
+
+Here is a list of a few of the dependencies that will be automatically installed when you use the commands defined in our `Taskfile.yml` files
+
+- [DockerSlim](repository.project.dockerslim) - Tool used to generate compact, secure images. Our system will automatically attempt to build both a regular image and a DockerSlim image when you adhere to the guidelines laid out in our [Docker Style Guide](https://gitlab.com/megabyte-labs/templates/docker). DockerSlim allows us to ship containers that can be significantly smaller in size (sometimes up to 90% smaller).
+- [container-structure-test](https://github.com/GoogleContainerTools/container-structure-test) - A Google product that allows you to define and run tests against Dockerfile builds. It is used to perform basic tests like making sure that a container can start without an error.
+- [GitLab Runner](https://docs.gitlab.com/runner/) - Tool that allows for the simulation and execution of GitLab CI workflows. It can run tests / scenarios defined in the `.gitlab-ci.yml` file.
+
+Having an understanding of these tools is key to adhereing to our [Docker Style Guide](https://gitlab.com/megabyte-labs/templates/docker) and ensuring that each project can integrate into our automation pipelines.
 
 <a href="#getting-started" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -93,87 +103,41 @@ _Each of the requirements links to an Ansible Role that can install the dependen
 To get started when developing one of [our Dockerfile projects](https://gitlab.com/megabyte-labs/docker) (after you have installed [Docker](repository.project.docker)), the first command you need to run in the root of the project is:
 
 ```shell
-bash .start.sh
+bash start.sh
 ```
 
-This command will:
-
-- Install missing dependencies without sudo (i.e. the binary dependencies will be stored in `~/.local/bin` and your PATH will be updated to reference the `~/.local/bin` directory)
-- Ensure Node.js dependencies are installed if the `node_modules/` folder is missing
-- Copy (and possibly overwrite) the shared common files from the [Dockerfile common files repository](repository.project.common_docker) and the [shared common files repository](repository.project.common_shared)
-- Update the `package.json` file
-- Re-generate the documentation
-- Register a pre-commit hook that only allows commits to register if tests are passed
-
-### Descriptions of Build Scripts
-
-After you run `npm i` (or `bash .start.sh`), you can view the various build commands by running `npm run info`. This will display a chart in your terminal with descriptions of the build scripts. It might look something like this:
-
-```shell
-❯ npm run info
-
-> ansible-lint@0.0.23 info
-> npm-scripts-info
-
-build:
-  Build the regular Docker image and then build the slim image
-build:latest:
-  Build the regular Docker image
-build:slim:
-  Build a compact Docker image with DockerSlim
-commit:
-  The preferred way of running git commit (instead of git commit, we prefer you run 'npm run commit' in the root of this repository)
-fix:
-  Automatically fix formatting errors
-info:
-  Logs descriptions of all the npm tasks
-prepare-release:
-  Updates the CHANGELOG with commits made using 'npm run commit' and updates the project to be ready for release
-publish:
-  Creates new release(s) and uploads the release(s) to DockerHub
-scan:
-  Scans images for vulnerabilities
-shell:
-  Run the Docker container and open a shell
-sizes:
-  List the sizes of the Docker images on the system
-test:
-  Validates the Dockerfile, tests the Docker image, and performs project linting
-update:
-  Runs .start.sh to automatically update meta files and documentation
-version:
-  Used by 'npm run prepare-release' to update the CHANGELOG and app version
-start:
-  Kickstart the application
-```
-
-You can then build the Docker image, for instance, by running `npm run build` or list the sizes of Docker images on your system by running `npm run sizes`. You can check out exactly what each command does by looking at the `package.json` file in the root of the project.
+This command will ensure the dependencies are installed and update the project to ensure upstream changes are integrated into the project. You should run it anytime you step away from a project (just in case changes were made to the upstream files).
 
 ### Creating DockerSlim Builds
 
-Whenever possible, a DockerSlim build should be provided and tagged as `:slim`. DockerSlim provides many configuration options so please check out the [DockerSlim documentation](website.dockerslim_github_page) to get a thorough understanding of it and what it is capable of. When you have formulated _and fully tested_ the proper DockerSlim configuration, you can add it to the `.blueprint.json` file.
+Whenever possible, a DockerSlim build should be provided and tagged as `:slim`. DockerSlim provides many configuration options so please check out the [DockerSlim documentation](website.dockerslim_github_page) to get a thorough understanding of it and what it is capable of. When you have formulated _and fully tested_ the proper DockerSlim configuration, you will need to add to the `blueprint` section of the `package.json` file. **More details on this are in our [Docker Style Guide](https://gitlab.com/megabyte-labs/templates/docker).**
 
 #### How to Determine Which Paths to Include
 
-In most cases, the DockerSlim configuration in `.blueprint.json` (which gets injected into `package.json`) will require the use of `--include-path`. If you were creating a slim build that included `jq`, for instance, then you would need to instruct DockerSlim to hold onto the `jq` binary. You can determine where the binary is stored on the target machine by running:
+In most cases, the DockerSlim configuration in `package.json` will require the use of `--include-path`. If you were creating a slim build that included `jq`, for instance, then you would need to instruct DockerSlim to hold onto the `jq` binary. You can determine where the binary is stored on the target machine by running:
 
 ```bash
 npm run shell
 which jq
 ```
 
-You would then need to include the path that the command above displays in the `dockerslim_command` key of `.blueprint.json`. The `.blueprint.json` might look something like this:
+You would then need to include the path that the command above displays in the `dockerSlimCommand` key of `blueprint` section in `package.json`. The `package.json` might look something like this:
 
 ```json
 {
   ...
-  "dockerslim_command": "--http-probe=false --exec 'npm install' --include-path '/usr/bin/jq'"
+  "blueprint": {
+    ...
+    "dockerSlimCommand": "--http-probe=false --exec 'npm install' --include-path '/usr/bin/jq'"
+  }
 }
 ```
 
 #### Determining Binary Dependencies
 
-If you tried to use the `"dockerslim_command"` above, you might notice that it is incomplete. That is because `jq` relies on some libraries that are not bundled into the executable. You can determine the libraries you need to include by using the `ldd` command like this:
+**Note: The method described in this section should not usually be required if you use the `--include-bin` flag (e.g. `--include-bin /usr/bin/jq`). The `--include-bin` option will automatically perform the steps outlined below.**
+
+If you tried to use the `dockerSlimCommand` above, you might notice that it is incomplete. That is because `jq` relies on some libraries that are not bundled into the executable. You can determine the libraries you need to include by using the `ldd` command like this:
 
 ```bash
 npm run shell
@@ -207,59 +171,28 @@ ls | grep ld-musl-x86_64.so.1
 exit
 ```
 
-You should then compare the output from the base image with the slim image. After you compare the two, in this case, you will see that the slim build is missing `/usr/lib/libonig.so.5` and `/usr/lib/libonig.so.5.1.0`. So, finally, you can complete the necessary configuration in `.blueprint.json` by including the paths to the missing libraries:
+You should then compare the output from the base image with the slim image. After you compare the two, in this case, you will see that the slim build is missing `/usr/lib/libonig.so.5` and `/usr/lib/libonig.so.5.1.0`. So, finally, you can complete the necessary configuration in `package.json` by including the paths to the missing libraries:
 
 ```json
 {
   ...
-  "dockerslim_command": "--http-probe=false --exec 'npm install' --include-path '/usr/bin/jq' --include-path '/usr/lib/libonig.so.5' --include-path '/usr/lib/libonig.so.5.1.0'"
+  "blueprint": {
+  ...
+    "dockerSlimCommand": "--http-probe=false --exec 'npm install' --include-path '/usr/bin/jq' --include-path '/usr/lib/libonig.so.5' --include-path '/usr/lib/libonig.so.5.1.0'"
+  }
 }
 ```
 
 ### Using a `paths.txt` File
 
-In the above example, we use `--include-path` to specify each file we want to include in the optimized Docker image. If you are ever including more than a couple includes, you should instead create a line return seperated list of paths to preserve in a file named `paths.txt`. You can then include the paths in the `"dockerslim_command"` by using utilizing `--preserve-path-file`. The `"dockerslim_command"` above would then look like this if you create the `paths.txt` file:
+In the above example, we use `--include-path` to specify each file we want to include in the optimized Docker image. If you are ever including more than a couple includes, you should instead create a line return seperated list of paths to preserve in a file named `local/paths.txt`. You can then include the paths in the `dockerSlimCommand` by using utilizing `--preserve-path-file`. The `dockerSlimCommand` above would then look like this if you create the `local/paths.txt` file:
 
 ```json
 {
   ...
-  "dockerslim_command": "--http-probe=false --exec 'npm install' --preserve-path-file 'paths.txt'"
+  "dockerSlimCommand": "--http-probe=false --exec 'npm install' --preserve-path-file 'local/paths.txt'"
 }
 ```
-
-### Updating the `.blueprint.json` File
-
-The `.blueprint.json` file stores some of the information required to automatically generate, scaffold, and update this repository when `bash .start.sh` is run. When creating a new Dockerfile project, the `.blueprint.json` file must be filled out. The following chart details the possible data that you can populate `.blueprint.json` with:
-
-| Variable                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `badge_style`           | Badge style to use from shields.io when generating the documentation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `description_template`  | This is used to populate the description in the `package.json` file which in turn gets used in the README and also may be used to describe the project on other websites. When you add the text `IMAGE_SIZE_PLACEHOLDER` to this variable, it will be replaced with container size information.                                                                                                                                                                                                                                                                                                           |
-| `docker_command`        | The command that you would normally run when using the Docker image as a one-liner. For Ansible Lint this command would just be `.` because the [Ansible Lint Docker project](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/ansible-lint) has an entrypoint of `ENTRYPOINT ['ansible-lint'] in its Dockerfile. So, combining the two means that the command that will run is `ansible-lint .`. However, if the Ansible Lint project did not specify an entrypoint then this field would have to be `ansible-lint .` since that is the command that you would normally run when using this tool. |
-| `docker_command_alias`  | Used for generating the documentation for running the Docker container via a bash alias. This variable is the function name. For YAML Lint, this would be `yamllint`. If the user decided to add the bash alias listed in the README in the [YAML Lint repository](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/yamllint), they would access the alias by running `yamllint`. To get a better idea, you should refer to any of our Dockerfile project's README files.                                                                                                                          |
-| `dockerhub_description` | The short description of the project. This is shown on DockerHub and has a limit of 100 characters.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `dockerslim_command`    | The arguments passed to DockerSlim when generating a slim build. **Any \ included in this string must be added as \\\ due to multiple levels of escape character parsings.**.                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `preferred_tag`         | In general, this should either be `latest` or `slim`. This is the tag that is used to generate the parts of the documentation that refer to specific Docker image tags.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `pretty_name`           | The full (pretty) name of the tool (used for generating documentation). This should be capitalized and/or use the same capitalization that the product officially uses (if applicable).                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `project_title`         | The title of the project - this controls the title of the README.md and sometimes may be the same as the `pretty_name`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `slug`                  | The slug is found by looking at the URL of the repository (e.g. for Ansible Lint, the slug would be `ansible-lint` since the last part of [this URL](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/ansible-lint) is ansible-lint).                                                                                                                                                                                                                                                                                                                                                              |
-| `slug_full`             | This variable is populated by `.start.sh` by combining the `subgroup` and `slug` or simply using the `slug` depending on which subgroup the project belongs to.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `subgroup`              | The subgroup is found by looking at the second to last part of the URL of the repository (e.g. for Ansible Lint the subgroup would be `ci-pipeline`).                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-
-When populating the `.blueprint.json` file, it is a good idea to check out [repositories in the same group](https://gitlab.com/megabyte-labs/docker/software) to see what variables are being utilized.
-
-<a href="#creating-a-new-dockerfile-project" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
-
-## Creating a New Dockerfile Project
-
-If you are creating a new Dockerfile project, you should first populate the `.blueprint.json` file as described above. After you have a `.blueprint.json` in the root of the project, you should also copy the `.start.sh` file from another one of our Dockerfile projects. With the files in place, you can then run `bash .start.sh`. This will copy over all the other files and set up the project. You should then:
-
-1. Rename the `"name"` field to the desired image name (e.g. `megabytelabs/**name**:slim`).
-2. Code your Dockerfile
-3. Create a test case for your Dockerfile (more details are in the [Creating Test Cases](#creating-test-cases) section)
-4. Test your Dockerfile by running `npm run test`
-5. Build your Dockerfile after you finish coding it using `npm run build`
-6. After everything is completely done, test the complete flow by running `npm run publish`
 
 <a href="#testing" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -293,51 +226,9 @@ When testing Docker-based web applications, ensure that after you destroy the co
 
 ## Linting
 
-We utilize several different linters to ensure that all our Dockerfile projects use similar design patterns. Linting sometimes even helps spot errors as well. The most important linter for Dockerfile projects is called [Haskell Dockerfile Linter](website.hadolint_github_page) (or hadolint). You can install it by utilizing our one-line installation method found in our [hadolint Ansible role](repository.project.hadolint). In order for a merge request to be accepted, it has to successfully pass hadolint tests. For more information about hadolint, check out the [Haskell Dockerfile Linter GitHub page](website.hadolint_github_page).
-
-We also incorporate other linters that are run automatically whenever you commit code (assuming you have run `npm i` in the root of the project). These linters include:
-
-- [Prettier](repository.project.prettier)
-- [Shellcheck](repository.project.shellcheck)
+We utilize several different linters to ensure that all our Dockerfile projects use similar design patterns. Linting sometimes even helps spot errors as well. The most important linter for Dockerfile projects is called [Haskell Dockerfile Linter](website.hadolint_github_page) (or hadolint). We also use many other linting tools depending on the file type. Simply run `git commit` to invoke the pre-commit hook (after running `bash start.sh` ahead of time) to automatically lint the changed files in the project.
 
 Some of the linters are also baked into the CI pipeline. The pipeline will trigger whenever you post a commit to a branch. All of these pipeline tasks must pass in order for merge requests to be accepted. You can check the status of recently triggered pipelines for this project by going to the [CI/CD pipeline page](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/pipelines).
-
-<a href="#updating-meta-files-and-documentation" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
-
-## Updating Meta Files and Documentation
-
-Since we have hundreds of projects to maintain, the majority of the files inside each of our projects are shared across all the other projects of the same type. You can check out our [documentation group](https://gitlab.com/megabyte-labs/documentation) and [common files group](https://gitlab.com/megabyte-labs/common) to get an idea of how we seperate project types. We synchronize these common files across all our repositories with the `.start.sh` file. This file is automatically called when you run `npm i`. If you would like to update the project without running `npm i`, you can also just directly call the script by running `bash .start.sh`. You might want to do this to get the latest upstream changes or if you make an edit to the `.blueprint.json` file (which populates the common files to make them specific to the current project).
-
-### `.blueprint.json` and @appnest/readme
-
-In the root of all of our repositories, we include a file named `.blueprint.json`. This file stores variables that are used in our `.start.sh` script. Most of the variables stored in `.blueprint.json` are used for generating documentation. All of our documentation is generated using variables and document partials that we feed into a project called [@appnest/readme](https://github.com/andreasbm/readme) (which is in charge of generating the final README/CONTRIBUTING guides). When @appnest/readme is run, it includes the variables stored in `.blueprint.json` in the context that it uses to inject variables in the documentation. You can view the documentation partials by checking out the `./.modules/docs` folder which is a submodule that is shared across all our projects of the same type.
-
-For every project that is included in our eco-system, we require certain fields to be filled out in the `.blueprint.json` file. Some of the fields in the file are auto-generated. The fields that need to be filled out as well as descriptions of what they should contain are listed in the chart below:
-
-| Variable                | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `badge_style`           | Badge style to use from shields.io when generating the documentation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
-| `description_template`  | This is used to populate the description in the `package.json` file which in turn gets used in the README and also may be used to describe the project on other websites. When you add the text `IMAGE_SIZE_PLACEHOLDER` to this variable, it will be replaced with container size information.                                                                                                                                                                                                                                                                                                           |
-| `docker_command`        | The command that you would normally run when using the Docker image as a one-liner. For Ansible Lint this command would just be `.` because the [Ansible Lint Docker project](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/ansible-lint) has an entrypoint of `ENTRYPOINT ['ansible-lint'] in its Dockerfile. So, combining the two means that the command that will run is `ansible-lint .`. However, if the Ansible Lint project did not specify an entrypoint then this field would have to be `ansible-lint .` since that is the command that you would normally run when using this tool. |
-| `docker_command_alias`  | Used for generating the documentation for running the Docker container via a bash alias. This variable is the function name. For YAML Lint, this would be `yamllint`. If the user decided to add the bash alias listed in the README in the [YAML Lint repository](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/yamllint), they would access the alias by running `yamllint`. To get a better idea, you should refer to any of our Dockerfile project's README files.                                                                                                                          |
-| `dockerhub_description` | The short description of the project. This is shown on DockerHub and has a limit of 100 characters.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `dockerslim_command`    | The arguments passed to DockerSlim when generating a slim build. **Any \ included in this string must be added as \\\ due to multiple levels of escape character parsings.**.                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| `preferred_tag`         | In general, this should either be `latest` or `slim`. This is the tag that is used to generate the parts of the documentation that refer to specific Docker image tags.                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `pretty_name`           | The full (pretty) name of the tool (used for generating documentation). This should be capitalized and/or use the same capitalization that the product officially uses (if applicable).                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `project_title`         | The title of the project - this controls the title of the README.md and sometimes may be the same as the `pretty_name`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| `slug`                  | The slug is found by looking at the URL of the repository (e.g. for Ansible Lint, the slug would be `ansible-lint` since the last part of [this URL](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline/ansible-lint) is ansible-lint).                                                                                                                                                                                                                                                                                                                                                              |
-| `slug_full`             | This variable is populated by `.start.sh` by combining the `subgroup` and `slug` or simply using the `slug` depending on which subgroup the project belongs to.                                                                                                                                                                                                                                                                                                                                                                                                                                           |
-| `subgroup`              | The subgroup is found by looking at the second to last part of the URL of the repository (e.g. for Ansible Lint the subgroup would be `ci-pipeline`).                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-
-### `logo.png`
-
-We include a `logo.png` file in all of our projects. This image is automatically integrated with GitLab so that a thumbnail appears next to the project. It is also shown in the README to give the user a better idea of what the project relates to. All repositories should include the `logo.png` file. When adding a `logo.png` file please _strictly_ adhere to the steps below:
-
-1. Use Google image search to find a logo that best represents the product. Ensure the image is a `.png` file and that it has a transparent background, if possible. Ideally, the image should be the official logo if the repository would be best represented by an official logo. The image should be at least 200x200 pixels.
-2. After downloading the image, ensure you have the sharp-cli installed by running `npm install -g sharp-cli`.
-3. Resize the image to 200x200 pixels by running `sharp -i file_location.png -o logo.png resize 200 200`.
-4. Compress the resized image by dragging and dropping the resized image into the [TinyPNG web application](https://tinypng.com/).
-5. Download the compressed image and add it to the root of the repository. Make sure it is named `logo.png`.
 
 <a href="#pull-requests" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -345,12 +236,28 @@ We include a `logo.png` file in all of our projects. This image is automatically
 
 All pull requests should be associated with issues. You can find the [issues board on GitLab](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/issues). The pull requests should be made to [the GitLab repository](https://gitlab.com/megabyte-labs/docker/software/devcontainer) instead of the [GitHub repository](ProfessorManhattan/docker-devcontainer). This is because we use GitLab as our primary repository and mirror the changes to GitHub for the community.
 
-### How to Commit Code
-
-Instead of using `git commit`, we prefer that you use `npm run commit`. You will understand why when you try it but basically it streamlines the commit process and helps us generate better CHANGELOG files.
-
 ### Pre-Commit Hook
 
-Even if you decide not to use `npm run commit`, you will see that `git commit` behaves differently because there is a pre-commit hook that installs automatically after you run `npm i` (or `bash .start.sh`). This pre-commit hook is there to test your code before committing and help you become a better coder. If you need to bypass the pre-commit hook, then you may add the `--no-verify` tag at the end of your `git commit` command (e.g. `git commit -m "Commit" --no-verify`).
+Even if you decide not to use `npm run commit`, you will see that `git commit` behaves differently because there is a pre-commit hook that installs automatically after you run `npm i` (or `bash start.sh`). This pre-commit hook is there to test your code before committing and help you become a better coder. If you need to bypass the pre-commit hook, then you may add the `--no-verify` tag at the end of your `git commit` command and `HUSKY=0` at the beginning (e.g. `HUSKY=0 git commit -m "Commit" --no-verify`).
 
-{{ load:.config/docs/common/contributing/troubleshooting.md }}
+<a href="#style-guides" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
+
+## Style Guides
+
+All code projects have their own style. Coding style will vary from coder to coder. Although we do not have a strict style guide for each project, we do require that you be well-versed in what coding style is most acceptable and _best_. To do this, you should read through style guides that are made available by organizations that have put a lot of effort into studying the reason for coding one way or another.
+
+### Recommended Style Guides
+
+Style guides are generally written for a specific language but a great place to start learning about the best coding practices is on [Google Style Guides](https://google.github.io/styleguide/). Follow the link and you will see style guides for most popular languages. We also recommend that you look through the following style guides, depending on what language you are coding with:
+
+- [Airbnb JavaScript Style Guide](https://github.com/airbnb/javascript)
+- [Angular Style Guide](https://angular.io/guide/styleguide)
+- [Effective Go](https://go.dev/doc/effective_go)
+- [PEP 8 Python Style Guide](https://www.python.org/dev/peps/pep-0008/)
+- [Git Style Guide](https://github.com/agis/git-style-guide)
+
+For more informative links, refer to the [GitHub Awesome Guidelines List](https://github.com/Kristories/awesome-guidelines).
+
+### Strict Linting
+
+One way we enforce code style is by including the best standard linters into our projects. We normally keep the settings pretty strict. Although it may seem pointless and annoying at first, these linters will make you a better coder since you will learn to adapt your style to the style of the group of people who spent countless hours creating the linter in the first place.
