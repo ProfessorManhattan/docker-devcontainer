@@ -5,5 +5,5 @@
 {{ load:.config/docs/readme-docker-compose/overview.md }}
 {{ load:.config/docs/readme/requirements.md }}
 {{ load:docs/partials/guide.md }}
-{{ load:.config/docs/readme/contributing-details.md }}
-{{ load:.config/docs/readme/license.md }}
+{{ load:.config/docs/common/readme/contribute.md }}
+{{ load:.config/docs/common/readme/license.md }}

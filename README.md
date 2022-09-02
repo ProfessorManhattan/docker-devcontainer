@@ -1,4 +1,15 @@
-<!-- ⚠️ This README has been generated from the file(s) ".config/docs/blueprint-readme-software.md" ⚠️-->{{ load:.config/docs/readme/header.md }}
+<!-- ⚠️ This README has been generated from the file(s) ".config/docs/blueprint-readme-software.md" ⚠️--><div align="center">
+  <center>
+    <a href="https://github.com/megabyte-labs/docker-devcontainer">
+      <img width="148" height="148" alt="Megabyte Labs DevContainer logo" src="https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/raw/master/logo.png" />
+    </a>
+  </center>
+</div>
+<div align="center">
+  <center><h1 align="center"><i></i>An All-in-One DevContainer Environment for Rapid Development<i></i></h1></center>
+  <center><h4 style="color: #18c3d1;">Container maintained by <a href="https://megabyte.space" target="_blank">Megabyte Labs</a></h4><i></i></center>
+</div>
+
 <div align="center">
   <a href="https://megabyte.space" title="Megabyte Labs homepage" target="_blank">
     <img alt="Homepage" src="https://img.shields.io/website?down_color=%23FF4136&down_message=Down&label=Homepage&logo=home-assistant&logoColor=white&up_color=%232ECC40&up_message=Up&url=https%3A%2F%2Fmegabyte.space&style=for-the-badge" />
@@ -50,26 +61,14 @@
 
 ## Table of Contents
 
-- [Overview](#overview)
 - [Requirements](#requirements)
   - [Development Requirements](#development-requirements)
-- [Example Usage](#example-usage)
-  - [Integrating with GitLab CI](#integrating-with-gitlab-ci)
   - [Building the Docker Container](#building-the-docker-container)
   - [Building a Slim Container](#building-a-slim-container)
   - [Build Tools](#build-tools)
-
-<a href="#overview" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
-
-## Overview
-
-Utilizing Continuous Integration (CI) tools can improve developer efficiency drastically. They allow you to do things like scan new code for possible errors and automatically deploy new software.
-
-This repository is home to the build instructions for a Docker container that is just one piece to the CI puzzle. Nearly all of [our CI pipeline Docker projects](https://gitlab.com/megabyte-labs/dockerfile/ci-pipeline) serve a single purpose.
-
-Instead of using one of the countless pretty_name public Docker images available, we create it in-house so we know exactly what code is present in the container. We also ensure that all of our CI pipeline images are as small as possible so that our CI environment can download and run the specific task as quickly as possible. Using this repository as a base, you too can easily create your own in-house CI pipeline container image.
-
-At first glance, you might notice that there are many files in this repository. Nearly all the files and folders that have a period prepended to them are development configurations. The tools that these files and folders configure are meant to make development easier and faster. They are also meant to improve team development by forcing developers to follow strict standards so that the same design patterns are used across all of our repositories.
+- [Contributing](#contributing)
+  - [Affiliates](#affiliates)
+- [License](#license)
 
 <a href="#requirements" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
 
@@ -87,43 +86,6 @@ At first glance, you might notice that there are many files in this repository. 
 If you choose to utilize the development tools provided by this project then at some point you will have to run `bash start.sh` (or `npm i` which calls `bash start.sh` after it is done). The `start.sh` script will attempt to automatically install any requirements (without sudo) that are not already present on your build system to the user's `~/.local/bin` folder. The `start.sh` script also takes care of other tasks such as generating the documentation by calling tasks defined in the `Taskfile.yml`. For more details on how the optional requirements are used and set up, check out the [CONTRIBUTING.md](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/blob/master/docs/CONTRIBUTING.md) guide.
 
 When you are ready to start development, run `task --menu` to open an interactive dialog that will help you understand what build commands we have already engineered for you.
-
-<a href="#example-usage" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
-
-## Example Usage
-
-There are several different ways you can use the Docker container provided by this project. For starters, you can test the feature out locally by running:
-
-```shell
-docker run -v ${PWD}:/work -w /work megabytelabs/devcontainer:preferred_tag docker_command
-```
-
-This allows you to run pretty_name without installing it locally. This could be good for security since the application is within a container and also keeps your file system clean.
-
-You can also add a bash alias to your `~/.bashrc` file so that you can run the pretty_name command at any time. To do this, add the following snippet to your `~/.bashrc` file (or `~/.bash_profile` if you are on macOS):
-
-```shell
-docker_command_alias() {
-  docker run -v ${PWD}:/work -w /work megabytelabs/devcontainer:preferred_tag "$@"
-}
-```
-
-_Note: Some CLI tools run without any arguments passed in. For example, the CLI tool `ansible-lint` runs by simply entering `ansible-lint` in the terminal. Our Docker images default command is to show the version so to get around this quirk you would run `ansible-lint .`._
-
-### Integrating with GitLab CI
-
-The main purpose of this project is to build a Docker container that can be used in CI pipelines. For example, if you want to incorporate this CI pipeline tool into GitLab CI project then your first step would be to create a `.gitlab-ci.yml` file in the root of your repository that is hosted by GitLab. Your `.gitlab-ci.yml` file should look something like this:
-
-```yaml
----
-stages:
-  - lint
-
-include:
-  - remote: https://gitlab.com/megabyte-space/gitlab-ci-templates/-/raw/master/devcontainer.gitlab-ci.yml
-```
-
-That is it! pretty_name will now run anytime you commit code (that matches the parameters laid out in the `remote:` file above). Ideally, for production, you should copy the source code from the `remote:` link above to another location and update the `remote:` link to the file's new location. That way, you do not have to worry about any changes that are made to the `remote:` file by our team.
 
 ### Building the Docker Container
 
@@ -168,5 +130,50 @@ _Note:_ We use a custom-built version of [go-task/task](https://github.com/go-ta
 
 For more details, check out the [CONTRIBUTING.md](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/blob/master/CONTRIBUTING.md) file.
 
-{{ load:.config/docs/readme/contributing-details.md }}
-{{ load:.config/docs/readme/license.md }}
+<a href="#contributing" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! Feel free to check the [issues page](https://github.com/megabyte-labs/docker-devcontainer/issues). If you would like to contribute, please take a look at the [contributing guide](https://github.com/megabyte-labs/docker-devcontainer/blob/master/docs/CONTRIBUTING.md).
+
+<details>
+<summary><b>Sponsorship</b></summary>
+<br/>
+<blockquote>
+<br/>
+Dear Awesome Person,<br/><br/>
+I create open source projects out of love. Although I have a job, shelter, and as much fast food as I can handle, it would still be pretty cool to be appreciated by the community for something I have spent a lot of time and money on. Please consider sponsoring me! Who knows? Maybe I will be able to quit my job and publish open source full time.
+<br/><br/>Sincerely,<br/><br/>
+
+**_Brian Zalewski_**<br/><br/>
+
+</blockquote>
+
+<a title="Support us on Open Collective" href="https://opencollective.com/megabytelabs" target="_blank">
+  <img alt="Open Collective sponsors" src="https://img.shields.io/opencollective/sponsors/megabytelabs?logo=opencollective&label=OpenCollective&logoColor=white&style=for-the-badge" />
+</a>
+<a title="Support us on GitHub" href="https://github.com/ProfessorManhattan" target="_blank">
+  <img alt="GitHub sponsors" src="https://img.shields.io/github/sponsors/ProfessorManhattan?label=GitHub%20sponsors&logo=github&style=for-the-badge" />
+</a>
+<a href="https://www.patreon.com/ProfessorManhattan" title="Support us on Patreon" target="_blank">
+  <img alt="Patreon" src="https://img.shields.io/badge/Patreon-Support-052d49?logo=patreon&logoColor=white&style=for-the-badge" />
+</a>
+
+### Affiliates
+
+Below you will find a list of services we leverage that offer special incentives for signing up for their services through our special links:
+
+<a href="http://eepurl.com/h3aEdX" title="Sign up for $30 in MailChimp credits" target="_blank">
+  <img alt="MailChimp" src="https://cdn-images.mailchimp.com/monkey_rewards/grow-business-banner-2.png" />
+</a>
+<a href="https://www.digitalocean.com/?refcode=751743d45e36&utm_campaign=Referral_Invite&utm_medium=Referral_Program&utm_source=badge">
+  <img src="https://web-platforms.sfo2.digitaloceanspaces.com/WWW/Badge%203.svg" alt="DigitalOcean Referral Badge" />
+</a>
+
+</details>
+
+<a href="#license" style="width:100%"><img style="width:100%" src="https://gitlab.com/megabyte-labs/assets/-/raw/master/png/aqua-divider.png" /></a>
+
+## License
+
+Copyright © 2020-2021 [Megabyte LLC](https://megabyte.space). This project is [MIT](https://gitlab.com/megabyte-labs/docker/software/devcontainer/-/blob/master/LICENSE) licensed.
