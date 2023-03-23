@@ -24,16 +24,16 @@
     <img alt="Version: {{ pkg.version }}" src="https://img.shields.io/badge/version-{{ pkg.version }}-blue.svg?logo=data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgAQMAAABJtOi3AAAABlBMVEUAAAD///+l2Z/dAAAAAXRSTlMAQObYZgAAACNJREFUCNdjIACY//+BEp9hhM3hAzYQwoBIAqEDYQrCZLwAAGlFKxU1nF9cAAAAAElFTkSuQmCC&cacheSeconds=2592000&style={{ alt_badge_style }}" />
   </a>
   <a title="GitLab build status" href="{{ repository.gitlab }}{{ repository.location.commits.gitlab }}" target="_blank">
-    <img alt="Build status" src="https://img.shields.io/gitlab/pipeline-status/{{ repository.group.dockerfile_path }}/{{ subgroup }}/{{ slug }}?branch=master&label=build&logo=gitlab&logoColor=white&style={{ alt_badge_style }}">
+    <img alt="Build status" src="https://img.shields.io/gitlab/pipeline-status/{{ repository.group.dockerfile_path }}/{{ subgroup }}/{{ slug }}?branch=master&label=build&logo=gitlab&logoColor=white&style={{ alt_badge_style }}" />
   </a>
   <a title="DockerHub image size" href="https://hub.docker.com/repository/docker/megabytelabs/{{ slug }}" target="_blank">
-    <img alt="Image size" src="https://img.shields.io/docker/image-size/megabytelabs/{{ slug }}?logo=docker&sort=date&logoColor=white&style={{ alt_badge_style }}">
+    <img alt="Image size" src="https://img.shields.io/docker/image-size/megabytelabs/{{ slug }}?logo=docker&sort=date&logoColor=white&style={{ alt_badge_style }}" />
   </a>
   <a title="DockerHub pulls" href="https://hub.docker.com/repository/docker/megabytelabs/{{ slug }}" target="_blank">
-    <img alt="Pulls" src="https://img.shields.io/docker/pulls/megabytelabs/{{ slug }}?logo=docker&logoColor=white&style={{ alt_badge_style }}">
+    <img alt="Pulls" src="https://img.shields.io/docker/pulls/megabytelabs/{{ slug }}?logo=docker&logoColor=white&style={{ alt_badge_style }}" />
   </a>
   <a title="DockerHub stars" href="https://hub.docker.com/repository/docker/megabytelabs/{{ slug }}" target="_blank">
-    <img alt="Stars" src="https://img.shields.io/docker/stars/megabytelabs/{{ slug }}?logo=docker&logoColor=white&style={{ alt_badge_style }}">
+    <img alt="Stars" src="https://img.shields.io/docker/stars/megabytelabs/{{ slug }}?logo=docker&logoColor=white&style={{ alt_badge_style }}" />
   </a>
   <a title="Documentation" href="{{ link.docs }}/{{ group }}" target="_blank">
     <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg?logo=readthedocs&logoColor=white&style={{ alt_badge_style }}" />
